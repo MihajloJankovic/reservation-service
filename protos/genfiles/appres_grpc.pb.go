@@ -19,200 +19,200 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Accommodation_GetReservation_FullMethodName     = "/accommodation/GetReservation"
-	Accommodation_GetAllReservations_FullMethodName = "/accommodation/GetAllReservations"
-	Accommodation_SetReservation_FullMethodName     = "/accommodation/SetReservation"
-	Accommodation_UpdateReservation_FullMethodName  = "/accommodation/UpdateReservation"
+	Reservation_GetReservation_FullMethodName     = "/reservation/GetReservation"
+	Reservation_GetAllReservations_FullMethodName = "/reservation/GetAllReservations"
+	Reservation_SetReservation_FullMethodName     = "/reservation/SetReservation"
+	Reservation_UpdateReservation_FullMethodName  = "/reservation/UpdateReservation"
 )
 
-// AccommodationClient is the client API for Accommodation service.
+// ReservationClient is the client API for Reservation service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AccommodationClient interface {
+type ReservationClient interface {
 	GetReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*DummyLista, error)
 	GetAllReservations(ctx context.Context, in *Emptyaa, opts ...grpc.CallOption) (*DummyLista, error)
 	SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 	UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 }
 
-type accommodationClient struct {
+type reservationClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAccommodationClient(cc grpc.ClientConnInterface) AccommodationClient {
-	return &accommodationClient{cc}
+func NewReservationClient(cc grpc.ClientConnInterface) ReservationClient {
+	return &reservationClient{cc}
 }
 
-func (c *accommodationClient) GetReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*DummyLista, error) {
+func (c *reservationClient) GetReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*DummyLista, error) {
 	out := new(DummyLista)
-	err := c.cc.Invoke(ctx, Accommodation_GetReservation_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Reservation_GetReservation_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *accommodationClient) GetAllReservations(ctx context.Context, in *Emptyaa, opts ...grpc.CallOption) (*DummyLista, error) {
+func (c *reservationClient) GetAllReservations(ctx context.Context, in *Emptyaa, opts ...grpc.CallOption) (*DummyLista, error) {
 	out := new(DummyLista)
-	err := c.cc.Invoke(ctx, Accommodation_GetAllReservations_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Reservation_GetAllReservations_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *accommodationClient) SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error) {
+func (c *reservationClient) SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error) {
 	out := new(Emptyaa)
-	err := c.cc.Invoke(ctx, Accommodation_SetReservation_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Reservation_SetReservation_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *accommodationClient) UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error) {
+func (c *reservationClient) UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error) {
 	out := new(Emptyaa)
-	err := c.cc.Invoke(ctx, Accommodation_UpdateReservation_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Reservation_UpdateReservation_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AccommodationServer is the server API for Accommodation service.
-// All implementations must embed UnimplementedAccommodationServer
+// ReservationServer is the server API for Reservation service.
+// All implementations must embed UnimplementedReservationServer
 // for forward compatibility
-type AccommodationServer interface {
+type ReservationServer interface {
 	GetReservation(context.Context, *ReservationRequest) (*DummyLista, error)
 	GetAllReservations(context.Context, *Emptyaa) (*DummyLista, error)
 	SetReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
 	UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
-	mustEmbedUnimplementedAccommodationServer()
+	mustEmbedUnimplementedReservationServer()
 }
 
-// UnimplementedAccommodationServer must be embedded to have forward compatible implementations.
-type UnimplementedAccommodationServer struct {
+// UnimplementedReservationServer must be embedded to have forward compatible implementations.
+type UnimplementedReservationServer struct {
 }
 
-func (UnimplementedAccommodationServer) GetReservation(context.Context, *ReservationRequest) (*DummyLista, error) {
+func (UnimplementedReservationServer) GetReservation(context.Context, *ReservationRequest) (*DummyLista, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetReservation not implemented")
 }
-func (UnimplementedAccommodationServer) GetAllReservations(context.Context, *Emptyaa) (*DummyLista, error) {
+func (UnimplementedReservationServer) GetAllReservations(context.Context, *Emptyaa) (*DummyLista, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllReservations not implemented")
 }
-func (UnimplementedAccommodationServer) SetReservation(context.Context, *ReservationResponse) (*Emptyaa, error) {
+func (UnimplementedReservationServer) SetReservation(context.Context, *ReservationResponse) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetReservation not implemented")
 }
-func (UnimplementedAccommodationServer) UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error) {
+func (UnimplementedReservationServer) UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateReservation not implemented")
 }
-func (UnimplementedAccommodationServer) mustEmbedUnimplementedAccommodationServer() {}
+func (UnimplementedReservationServer) mustEmbedUnimplementedReservationServer() {}
 
-// UnsafeAccommodationServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AccommodationServer will
+// UnsafeReservationServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ReservationServer will
 // result in compilation errors.
-type UnsafeAccommodationServer interface {
-	mustEmbedUnimplementedAccommodationServer()
+type UnsafeReservationServer interface {
+	mustEmbedUnimplementedReservationServer()
 }
 
-func RegisterAccommodationServer(s grpc.ServiceRegistrar, srv AccommodationServer) {
-	s.RegisterService(&Accommodation_ServiceDesc, srv)
+func RegisterReservationServer(s grpc.ServiceRegistrar, srv ReservationServer) {
+	s.RegisterService(&Reservation_ServiceDesc, srv)
 }
 
-func _Accommodation_GetReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Reservation_GetReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReservationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccommodationServer).GetReservation(ctx, in)
+		return srv.(ReservationServer).GetReservation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Accommodation_GetReservation_FullMethodName,
+		FullMethod: Reservation_GetReservation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccommodationServer).GetReservation(ctx, req.(*ReservationRequest))
+		return srv.(ReservationServer).GetReservation(ctx, req.(*ReservationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Accommodation_GetAllReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Reservation_GetAllReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Emptyaa)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccommodationServer).GetAllReservations(ctx, in)
+		return srv.(ReservationServer).GetAllReservations(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Accommodation_GetAllReservations_FullMethodName,
+		FullMethod: Reservation_GetAllReservations_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccommodationServer).GetAllReservations(ctx, req.(*Emptyaa))
+		return srv.(ReservationServer).GetAllReservations(ctx, req.(*Emptyaa))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Accommodation_SetReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Reservation_SetReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReservationResponse)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccommodationServer).SetReservation(ctx, in)
+		return srv.(ReservationServer).SetReservation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Accommodation_SetReservation_FullMethodName,
+		FullMethod: Reservation_SetReservation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccommodationServer).SetReservation(ctx, req.(*ReservationResponse))
+		return srv.(ReservationServer).SetReservation(ctx, req.(*ReservationResponse))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Accommodation_UpdateReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Reservation_UpdateReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReservationResponse)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccommodationServer).UpdateReservation(ctx, in)
+		return srv.(ReservationServer).UpdateReservation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Accommodation_UpdateReservation_FullMethodName,
+		FullMethod: Reservation_UpdateReservation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccommodationServer).UpdateReservation(ctx, req.(*ReservationResponse))
+		return srv.(ReservationServer).UpdateReservation(ctx, req.(*ReservationResponse))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Accommodation_ServiceDesc is the grpc.ServiceDesc for Accommodation service.
+// Reservation_ServiceDesc is the grpc.ServiceDesc for Reservation service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Accommodation_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "accommodation",
-	HandlerType: (*AccommodationServer)(nil),
+var Reservation_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "reservation",
+	HandlerType: (*ReservationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetReservation",
-			Handler:    _Accommodation_GetReservation_Handler,
+			Handler:    _Reservation_GetReservation_Handler,
 		},
 		{
 			MethodName: "GetAllReservations",
-			Handler:    _Accommodation_GetAllReservations_Handler,
+			Handler:    _Reservation_GetAllReservations_Handler,
 		},
 		{
 			MethodName: "SetReservation",
-			Handler:    _Accommodation_SetReservation_Handler,
+			Handler:    _Reservation_SetReservation_Handler,
 		},
 		{
 			MethodName: "UpdateReservation",
-			Handler:    _Accommodation_UpdateReservation_Handler,
+			Handler:    _Reservation_UpdateReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

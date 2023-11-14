@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "../genfiles";
-service accommodation {
+service reservation {
   rpc GetReservation(ReservationRequest) returns (DummyLista);
   rpc GetAllReservations(Emptyaa) returns (DummyLista);
   rpc SetReservation(ReservationResponse) returns (Emptyaa);

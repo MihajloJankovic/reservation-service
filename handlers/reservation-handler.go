@@ -1,31 +1,60 @@
 package handlers
 
 import (
+	"context"
 	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
-	"google.golang.org/grpc"
 	"log"
 )
 
-type MyReservationServer struct{
-	protos.UnimplementedAccommodationServer
-	logger *log.logger
-	repo *ReservationRepo
+type MyReservationServer struct {
+	protos.UnimplementedReservationServer
+	logger *log.Logger
+	repo   *ReservationRepo
 }
 
 func NewServer(l *log.Logger, r *ReservationRepo) *MyReservationServer {
-	return &MyReservationServer{*new(protos.UnimplementedAccommodationServer), l, r}
+	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r}
 }
 
-func (s MyReservationServer) GetReservation(ctx context.Context, in *ReservationRequest) (*DummyLista, error){
-	out, err := s.repo.GetById(in.GetEmail())
+func (s MyReservationServer) GetReservation(ctx context.Context, in *protos.ReservationRequest) (*protos.DummyLista, error) {
+	out, err := s.repo.GetById(in.GetId())
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
 	}
-	ss := new(protos.DummyList)
+	ss := new(protos.DummyLista)
 	ss.Dummy = out
 	return ss, nil
 }
-GetAllReservations(ctx context.Context, in *Emptyaa, opts ...grpc.CallOption) (*DummyLista, error)
-SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
-UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
+func (s MyReservationServer) GetAllAccommodation(_ context.Context, in *protos.Emptyaa) (*protos.DummyLista, error) {
+	out, err := s.repo.GetAll()
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+	ss := new(protos.DummyLista)
+	ss.Dummy = out
+	return ss, nil
+}
+func (s MyReservationServer) SetAccommodation(_ context.Context, in *protos.ReservationResponse) (*protos.Emptyaa, error) {
+	out := new(protos.ReservationResponse)
+	out.Name = in.GetName()
+	out.Price = in.GetPrice()
+	out.Location = in.GetLocation()
+	out.Adress = in.GetAdress()
+	out.Email = in.GetEmail()
+
+	err := s.repo.Create(out)
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+	return new(protos.Emptyaa), nil
+}
+func (s MyReservationServer) UpdateAccommodation(_ context.Context, in *protos.ReservationResponse) (*protos.Emptyaa, error) {
+	err := s.repo.Update(in)
+	if err != nil {
+		return nil, err
+	}
+	return new(protos.Emptyaa), nil
+}
