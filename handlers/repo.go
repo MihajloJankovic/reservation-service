@@ -35,7 +35,7 @@ func New(ctx context.Context, logger *log.Logger) (*ReservationRepo, error) {
 
 // Disconnect from database
 func (rr *ReservationRepo) Disconnect(ctx context.Context) error {
-	err := ar.cli.Disconnect(ctx)
+	err := rr.cli.Disconnect(ctx)
 	if err != nil {
 		return err
 	}
@@ -48,14 +48,14 @@ func (rr *ReservationRepo) Ping() {
 	defer cancel()
 
 	// Check connection -> if no error, connection is established
-	err := ar.cli.Ping(ctx, readpref.Primary())
+	err := rr.cli.Ping(ctx, readpref.Primary())
 	if err != nil {
-		ar.logger.Println(err)
+		rr.logger.Println(err)
 	}
 	// Print available databases
-	databases, err := ar.cli.ListDatabaseNames(ctx, bson.M{})
+	databases, err := rr.cli.ListDatabaseNames(ctx, bson.M{})
 	if err != nil {
-		ar.logger.Println(err)
+		rr.logger.Println(err)
 	}
 	fmt.Println(databases)
 }
@@ -63,69 +63,69 @@ func (rr *ReservationRepo) GetAll() ([]*protos.ReservationResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	accommodationCollection := ar.getCollection()
-	var accommodationsSlice []*protos.ReservationResponse
+	reservationCollection := rr.getCollection()
+	var reservationsSlice []*protos.ReservationResponse
 
-	accommodationCursor, err := accommodationCollection.Find(ctx, bson.M{})
+	reservationCursor, err := reservationCollection.Find(ctx, bson.M{})
 	if err != nil {
-		ar.logger.Println(err)
+		rr.logger.Println(err)
 		return nil, err
 	}
-	if err = accommodationCursor.All(ctx, &accommodationsSlice); err != nil {
-		ar.logger.Println(err)
+	if err = reservationCursor.All(ctx, &reservationsSlice); err != nil {
+		rr.logger.Println(err)
 		return nil, err
 	}
-	return accommodationsSlice, nil
+	return reservationsSlice, nil
 }
-func (rr *ReservationRepo) GetById(email string) ([]*protos.AccommodationResponse, error) {
+func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	accommodationCollection := ar.getCollection()
-	var accommodationsSlice []*protos.AccommodationResponse
+	reservationCollection := rr.getCollection()
+	var reservationsSlice []*protos.ReservationResponse
 
 	// Assuming you have a filter based on the email, modify the filter as needed
-	filter := bson.M{"email": email}
+	filter := bson.M{"id": id}
 
-	accommodationCursor, err := accommodationCollection.Find(ctx, filter)
+	reservationCursor, err := reservationCollection.Find(ctx, filter)
 	if err != nil {
-		ar.logger.Println(err)
+		rr.logger.Println(err)
 		return nil, err
 	}
-	defer func(accommodationCursor *mongo.Cursor, ctx context.Context) {
-		err := accommodationCursor.Close(ctx)
+	defer func(reservationCursor *mongo.Cursor, ctx context.Context) {
+		err := reservationCursor.Close(ctx)
 		if err != nil {
-			ar.logger.Println(err)
+			rr.logger.Println(err)
 		}
-	}(accommodationCursor, ctx)
+	}(reservationCursor, ctx)
 
-	for accommodationCursor.Next(ctx) {
-		var accommodation protos.AccommodationResponse
-		if err := accommodationCursor.Decode(&accommodation); err != nil {
-			ar.logger.Println(err)
+	for reservationCursor.Next(ctx) {
+		var reservation protos.ReservationResponse
+		if err := reservationCursor.Decode(&reservation); err != nil {
+			rr.logger.Println(err)
 			return nil, err
 		}
-		accommodationsSlice = append(accommodationsSlice, &accommodation)
+		reservationsSlice = append(reservationsSlice, &reservation)
 	}
 
-	if err := accommodationCursor.Err(); err != nil {
-		ar.logger.Println(err)
+	if err := reservationCursor.Err(); err != nil {
+		rr.logger.Println(err)
 		return nil, err
 	}
 
-	return accommodationsSlice, nil
+	return reservationsSlice, nil
 }
-func (ar *ReservationRepo) Create(profile *protos.AccommodationResponse) error {
+func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	accommodationCollection := ar.getCollection()
+	accommodationCollection := rr.getCollection()
 
 	result, err := accommodationCollection.InsertOne(ctx, &profile)
 	if err != nil {
-		ar.logger.Println(err)
+		rr.logger.Println(err)
 		return err
 	}
-	ar.logger.Printf("Documents ID: %v\n", result.InsertedID)
+	rr.logger.Printf("Documents ID: %v\n", result.InsertedID)
 	return nil
 }
 
@@ -134,12 +134,15 @@ func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error
 	defer cancel()
 	reservationCollection := rr.getCollection()
 
-	filter := bson.M{"email": reservation.GetEmail()}
+	filter := bson.M{"id": reservation.GetId()}
 	update := bson.M{"$set": bson.M{
-		"id":       reservation.GetName(),
-		"price":    reservation.GetPrice(),
-		"location": reservation.GetLocation(),
-		"adress":   reservation.GetAdress(),
+		"id":             reservation.GetId(),
+		"email":          reservation.GetEmail(),
+		"dateFrom":       reservation.GetDateFrom(),
+		"dateTo":         reservation.GetDateTo(),
+		"pricePerson":    reservation.GetPricePerson(),
+		"priceAcc":       reservation.GetPriceAcc(),
+		"numberOfPeople": reservation.GetNumberOfPeople(),
 	}}
 	result, err := reservationCollection.UpdateOne(ctx, filter, update)
 	rr.logger.Printf("Documents matched: %v\n", result.MatchedCount)
@@ -153,7 +156,7 @@ func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error
 }
 
 func (rr *ReservationRepo) getCollection() *mongo.Collection {
-	accommodationDatabase := ar.cli.Database("mongoAccommodation")
-	accommodationCollection := accommodationDatabase.Collection("accommodations")
+	accommodationDatabase := rr.cli.Database("mongoReservation")
+	accommodationCollection := accommodationDatabase.Collection("reservations")
 	return accommodationCollection
 }
