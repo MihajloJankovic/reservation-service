@@ -16,7 +16,7 @@ func NewServer(l *log.Logger, r *ReservationRepo) *MyReservationServer {
 	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r}
 }
 
-func (s MyReservationServer) GetReservation(ctx context.Context, in *protos.ReservationRequest) (*protos.DummyLista, error) {
+func (s MyReservationServer) GetReservation(_ context.Context, in *protos.ReservationRequest) (*protos.DummyLista, error) {
 	out, err := s.repo.GetById(in.GetId())
 	if err != nil {
 		s.logger.Println(err)
@@ -38,11 +38,13 @@ func (s MyReservationServer) GetAllAccommodation(_ context.Context, in *protos.E
 }
 func (s MyReservationServer) SetAccommodation(_ context.Context, in *protos.ReservationResponse) (*protos.Emptyaa, error) {
 	out := new(protos.ReservationResponse)
-	out.Name = in.GetName()
-	out.Price = in.GetPrice()
-	out.Location = in.GetLocation()
-	out.Adress = in.GetAdress()
+	out.Id = in.GetId()
 	out.Email = in.GetEmail()
+	out.DateFrom = in.GetDateFrom()
+	out.DateTo = in.GetDateTo()
+	out.PricePerson = in.GetPricePerson()
+	out.PriceAcc = in.GetPriceAcc()
+	out.NumberOfPeople = in.GetNumberOfPeople()
 
 	err := s.repo.Create(out)
 	if err != nil {

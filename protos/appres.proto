@@ -12,7 +12,7 @@ message DummyLista {
 }
 
 message  ReservationRequest {
-  string email = 1;
+  int32 id = 1;
 }
 message  ReservationResponse {
   int32 id = 1;
