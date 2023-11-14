@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "../genfiles";
+service accommodation {
+  rpc GetReservation(ReservationRequest) returns (DummyLista);
+  rpc GetAllReservations(Emptyaa) returns (DummyLista);
+  rpc SetReservation(ReservationResponse) returns (Emptyaa);
+  rpc UpdateReservation(ReservationResponse) returns (Emptyaa);
+}
+message DummyLista {
+  repeated ReservationResponse dummy = 1;
+}
+
+message  ReservationRequest {
+  string email = 1;
+}
+message  ReservationResponse {
+  int32 id = 1;
+  string email = 2;
+  string dateFrom = 3;
+  string dateTo = 4;
+  int32 pricePerson = 5;
+  int32 priceAcc = 6;
+  int32 numberOfPeople = 7;
+
+}
+message  Emptyaa {
+}
