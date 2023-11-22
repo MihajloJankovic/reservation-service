@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
 	"go.mongodb.org/mongo-driver/bson"
@@ -77,6 +78,20 @@ func (rr *ReservationRepo) GetAll() ([]*protos.ReservationResponse, error) {
 	}
 	return reservationsSlice, nil
 }
+func (pr *ReservationRepo) DeleteByAccomandation(xtx context.Context, in *protos.DeleteRequest) (*protos.Emptyaa, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resCollection := pr.getCollection()
+
+	filter := bson.M{"accid": in.GetUid()}
+	_, err := resCollection.DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, errors.New("Coundnt delete")
+	}
+
+	return new(protos.Emptyaa), nil
+}
 func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -136,13 +151,8 @@ func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error
 
 	filter := bson.M{"id": reservation.GetId()}
 	update := bson.M{"$set": bson.M{
-		"id":             reservation.GetId(),
-		"email":          reservation.GetEmail(),
-		"dateFrom":       reservation.GetDateFrom(),
-		"dateTo":         reservation.GetDateTo(),
-		"pricePerson":    reservation.GetPricePerson(),
-		"priceAcc":       reservation.GetPriceAcc(),
-		"numberOfPeople": reservation.GetNumberOfPeople(),
+		"dateFrom": reservation.GetDateFrom(),
+		"dateTo":   reservation.GetDateTo(),
 	}}
 	result, err := reservationCollection.UpdateOne(ctx, filter, update)
 	rr.logger.Printf("Documents matched: %v\n", result.MatchedCount)

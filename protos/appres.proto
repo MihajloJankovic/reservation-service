@@ -6,11 +6,14 @@ service reservation {
   rpc GetAllReservations(Emptyaa) returns (DummyLista);
   rpc SetReservation(ReservationResponse) returns (Emptyaa);
   rpc UpdateReservation(ReservationResponse) returns (Emptyaa);
+  rpc DeleteByAccomnendation(DeleteRequest) returns (Emptyaa);
 }
 message DummyLista {
   repeated ReservationResponse dummy = 1;
 }
-
+message  DeleteRequest {
+   string uid = 1;
+}
 message  ReservationRequest {
   int32 id = 1;
 }
@@ -22,6 +25,7 @@ message  ReservationResponse {
   int32 pricePerson = 5;
   int32 priceAcc = 6;
   int32 numberOfPeople = 7;
+  string accid = 8;
 
 }
 message  Emptyaa {

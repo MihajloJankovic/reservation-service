@@ -21,6 +21,15 @@ func isValidDateFormat(dateStr string) bool {
 	_, err := time.Parse("2006-01-02", dateStr)
 	return err == nil
 }
+func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context,in *protos.DeleteRequest) (*protos.Emptyaa, error){
+	out, err := s.repo.DeleteByAccomandation(xtx,in)
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+
+	return out, nil
+}
 func (s MyReservationServer) GetReservation(_ context.Context, in *protos.ReservationRequest) (*protos.DummyLista, error) {
 	if in.GetId() <= 0 {
 		return nil, errors.New("Invalid input. Ensure a valid ID is provided.")
