@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Reservation_GetReservation_FullMethodName         = "/reservation/GetReservation"
-	Reservation_GetAllReservations_FullMethodName     = "/reservation/GetAllReservations"
-	Reservation_SetReservation_FullMethodName         = "/reservation/SetReservation"
-	Reservation_UpdateReservation_FullMethodName      = "/reservation/UpdateReservation"
-	Reservation_DeleteByAccomnendation_FullMethodName = "/reservation/DeleteByAccomnendation"
-	Reservation_CheckActiveReservation_FullMethodName = "/reservation/CheckActiveReservation"
+	Reservation_GetReservation_FullMethodName              = "/reservation/GetReservation"
+	Reservation_GetAllReservations_FullMethodName          = "/reservation/GetAllReservations"
+	Reservation_SetReservation_FullMethodName              = "/reservation/SetReservation"
+	Reservation_UpdateReservation_FullMethodName           = "/reservation/UpdateReservation"
+	Reservation_DeleteByAccomnendation_FullMethodName      = "/reservation/DeleteByAccomnendation"
+	Reservation_CheckActiveReservation_FullMethodName      = "/reservation/CheckActiveReservation"
+	Reservation_CheckUsersActiveReservation_FullMethodName = "/reservation/CheckUsersActiveReservation"
 )
 
 // ReservationClient is the client API for Reservation service.
@@ -37,6 +38,7 @@ type ReservationClient interface {
 	UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 	DeleteByAccomnendation(ctx context.Context, in *DeleteRequestaa, opts ...grpc.CallOption) (*Emptyaa, error)
 	CheckActiveReservation(ctx context.Context, in *DateFromDateTo, opts ...grpc.CallOption) (*Emptyaa, error)
+	CheckUsersActiveReservation(ctx context.Context, in *EmailCheck, opts ...grpc.CallOption) (*Emptyaa, error)
 }
 
 type reservationClient struct {
@@ -101,6 +103,15 @@ func (c *reservationClient) CheckActiveReservation(ctx context.Context, in *Date
 	return out, nil
 }
 
+func (c *reservationClient) CheckUsersActiveReservation(ctx context.Context, in *EmailCheck, opts ...grpc.CallOption) (*Emptyaa, error) {
+	out := new(Emptyaa)
+	err := c.cc.Invoke(ctx, Reservation_CheckUsersActiveReservation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServer is the server API for Reservation service.
 // All implementations must embed UnimplementedReservationServer
 // for forward compatibility
@@ -111,6 +122,7 @@ type ReservationServer interface {
 	UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
 	DeleteByAccomnendation(context.Context, *DeleteRequestaa) (*Emptyaa, error)
 	CheckActiveReservation(context.Context, *DateFromDateTo) (*Emptyaa, error)
+	CheckUsersActiveReservation(context.Context, *EmailCheck) (*Emptyaa, error)
 	mustEmbedUnimplementedReservationServer()
 }
 
@@ -135,6 +147,9 @@ func (UnimplementedReservationServer) DeleteByAccomnendation(context.Context, *D
 }
 func (UnimplementedReservationServer) CheckActiveReservation(context.Context, *DateFromDateTo) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckActiveReservation not implemented")
+}
+func (UnimplementedReservationServer) CheckUsersActiveReservation(context.Context, *EmailCheck) (*Emptyaa, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckUsersActiveReservation not implemented")
 }
 func (UnimplementedReservationServer) mustEmbedUnimplementedReservationServer() {}
 
@@ -257,6 +272,24 @@ func _Reservation_CheckActiveReservation_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Reservation_CheckUsersActiveReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailCheck)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServer).CheckUsersActiveReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Reservation_CheckUsersActiveReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServer).CheckUsersActiveReservation(ctx, req.(*EmailCheck))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Reservation_ServiceDesc is the grpc.ServiceDesc for Reservation service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var Reservation_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckActiveReservation",
 			Handler:    _Reservation_CheckActiveReservation_Handler,
+		},
+		{
+			MethodName: "CheckUsersActiveReservation",
+			Handler:    _Reservation_CheckUsersActiveReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

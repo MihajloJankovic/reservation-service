@@ -173,6 +173,7 @@ func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *proto
 			return nil, err
 		}
 		return new(protos.Emptyaa), nil
+
 	}
 	return nil, errors.New("No result")
 }
