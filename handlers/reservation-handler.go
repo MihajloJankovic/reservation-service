@@ -5,6 +5,7 @@ import (
 	"errors"
 	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -17,10 +18,26 @@ type MyReservationServer struct {
 func NewServer(l *log.Logger, r *ReservationRepo) *MyReservationServer {
 	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r}
 }
+
 func isValidDateFormat(dateStr string) bool {
 	_, err := time.Parse("2006-01-02", dateStr)
 	return err == nil
 }
+
+func trimReservationFields(reservation *protos.ReservationResponse) *protos.ReservationResponse {
+	return &protos.ReservationResponse{
+		Id:             reservation.GetId(),
+		Email:          strings.TrimSpace(reservation.GetEmail()),
+		DateFrom:       strings.TrimSpace(reservation.GetDateFrom()),
+		DateTo:         strings.TrimSpace(reservation.GetDateTo()),
+		PricePerson:    reservation.GetPricePerson(),
+		PriceAcc:       reservation.GetPriceAcc(),
+		NumberOfPeople: reservation.GetNumberOfPeople(),
+		Accid:          strings.TrimSpace(reservation.GetAccid()),
+		// Add trimming for other fields here
+	}
+}
+
 func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
 	out, err := s.repo.DeleteByAccomandation(xtx, in)
 	if err != nil {
@@ -30,6 +47,7 @@ func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context, in *pro
 
 	return out, nil
 }
+
 func (s MyReservationServer) GetReservation(_ context.Context, in *protos.ReservationRequest) (*protos.DummyLista, error) {
 	if in.GetId() <= 0 {
 		return nil, errors.New("Invalid input. Ensure a valid ID is provided.")
@@ -45,6 +63,7 @@ func (s MyReservationServer) GetReservation(_ context.Context, in *protos.Reserv
 	ss.Dummy = out
 	return ss, nil
 }
+
 func (s MyReservationServer) GetAllReservation(_ context.Context, in *protos.Emptyaa) (*protos.DummyLista, error) {
 	out, err := s.repo.GetAll()
 	if err != nil {
@@ -55,19 +74,23 @@ func (s MyReservationServer) GetAllReservation(_ context.Context, in *protos.Emp
 	ss.Dummy = out
 	return ss, nil
 }
+
 func (s MyReservationServer) SetReservation(_ context.Context, in *protos.ReservationResponse) (*protos.Emptyaa, error) {
+	// Trim whitespaces from all fields
+	trimmedReservation := trimReservationFields(in)
+
 	// Validate required fields
-	if in.GetId() <= 0 || in.GetEmail() == "" || in.GetDateFrom() == "" || in.GetDateTo() == "" {
+	if trimmedReservation.GetId() <= 0 || trimmedReservation.GetEmail() == "" || trimmedReservation.GetDateFrom() == "" || trimmedReservation.GetDateTo() == "" {
 		return nil, errors.New("Invalid input. Ensure all required fields are provided.")
 	}
 
 	// Convert date strings to time.Time
-	dateFrom, err := time.Parse("2006-01-02", in.GetDateFrom())
+	dateFrom, err := time.Parse("2006-01-02", trimmedReservation.GetDateFrom())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateFrom. Use yyyy-mm-dd.")
 	}
 
-	dateTo, err := time.Parse("2006-01-02", in.GetDateTo())
+	dateTo, err := time.Parse("2006-01-02", trimmedReservation.GetDateTo())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateTo. Use yyyy-mm-dd.")
 	}
@@ -79,7 +102,7 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 
 	// Additional validation for other fields if needed
 
-	err = s.repo.Create(in)
+	err = s.repo.Create(trimmedReservation)
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
@@ -88,23 +111,26 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 }
 
 func (s MyReservationServer) UpdateReservation(_ context.Context, in *protos.ReservationResponse) (*protos.Emptyaa, error) {
+	// Trim whitespaces from all fields
+	trimmedReservation := trimReservationFields(in)
+
 	// Validate required fields
-	if in.GetId() <= 0 || in.GetEmail() == "" || in.GetDateFrom() == "" || in.GetDateTo() == "" {
+	if trimmedReservation.GetId() <= 0 || trimmedReservation.GetEmail() == "" || trimmedReservation.GetDateFrom() == "" || trimmedReservation.GetDateTo() == "" {
 		return nil, errors.New("Invalid input. Ensure all required fields are provided.")
 	}
 
 	// Validate date format
-	if !isValidDateFormat(in.GetDateFrom()) || !isValidDateFormat(in.GetDateTo()) {
+	if !isValidDateFormat(trimmedReservation.GetDateFrom()) || !isValidDateFormat(trimmedReservation.GetDateTo()) {
 		return nil, errors.New("Invalid date format. Use yyyy-mm-dd.")
 	}
 
 	// Validate date range
-	dateFrom, err := time.Parse("2006-01-02", in.GetDateFrom())
+	dateFrom, err := time.Parse("2006-01-02", trimmedReservation.GetDateFrom())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateFrom. Use yyyy-mm-dd.")
 	}
 
-	dateTo, err := time.Parse("2006-01-02", in.GetDateTo())
+	dateTo, err := time.Parse("2006-01-02", trimmedReservation.GetDateTo())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateTo. Use yyyy-mm-dd.")
 	}
@@ -115,7 +141,7 @@ func (s MyReservationServer) UpdateReservation(_ context.Context, in *protos.Res
 
 	// Additional validation for other fields if needed
 
-	err = s.repo.Update(in)
+	err = s.repo.Update(trimmedReservation)
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
