@@ -21,8 +21,8 @@ func isValidDateFormat(dateStr string) bool {
 	_, err := time.Parse("2006-01-02", dateStr)
 	return err == nil
 }
-func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context,in *protos.DeleteRequest) (*protos.Emptyaa, error){
-	out, err := s.repo.DeleteByAccomandation(xtx,in)
+func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
+	out, err := s.repo.DeleteByAccomandation(xtx, in)
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err

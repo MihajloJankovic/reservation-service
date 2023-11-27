@@ -78,7 +78,7 @@ func (rr *ReservationRepo) GetAll() ([]*protos.ReservationResponse, error) {
 	}
 	return reservationsSlice, nil
 }
-func (pr *ReservationRepo) DeleteByAccomandation(xtx context.Context, in *protos.DeleteRequest) (*protos.Emptyaa, error) {
+func (pr *ReservationRepo) DeleteByAccomandation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

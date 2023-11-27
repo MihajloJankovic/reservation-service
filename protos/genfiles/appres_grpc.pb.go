@@ -34,7 +34,7 @@ type ReservationClient interface {
 	GetAllReservations(ctx context.Context, in *Emptyaa, opts ...grpc.CallOption) (*DummyLista, error)
 	SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 	UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
-	DeleteByAccomnendation(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Emptyaa, error)
+	DeleteByAccomnendation(ctx context.Context, in *DeleteRequestaa, opts ...grpc.CallOption) (*Emptyaa, error)
 }
 
 type reservationClient struct {
@@ -81,7 +81,7 @@ func (c *reservationClient) UpdateReservation(ctx context.Context, in *Reservati
 	return out, nil
 }
 
-func (c *reservationClient) DeleteByAccomnendation(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Emptyaa, error) {
+func (c *reservationClient) DeleteByAccomnendation(ctx context.Context, in *DeleteRequestaa, opts ...grpc.CallOption) (*Emptyaa, error) {
 	out := new(Emptyaa)
 	err := c.cc.Invoke(ctx, Reservation_DeleteByAccomnendation_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -98,7 +98,7 @@ type ReservationServer interface {
 	GetAllReservations(context.Context, *Emptyaa) (*DummyLista, error)
 	SetReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
 	UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
-	DeleteByAccomnendation(context.Context, *DeleteRequest) (*Emptyaa, error)
+	DeleteByAccomnendation(context.Context, *DeleteRequestaa) (*Emptyaa, error)
 	mustEmbedUnimplementedReservationServer()
 }
 
@@ -118,7 +118,7 @@ func (UnimplementedReservationServer) SetReservation(context.Context, *Reservati
 func (UnimplementedReservationServer) UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateReservation not implemented")
 }
-func (UnimplementedReservationServer) DeleteByAccomnendation(context.Context, *DeleteRequest) (*Emptyaa, error) {
+func (UnimplementedReservationServer) DeleteByAccomnendation(context.Context, *DeleteRequestaa) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByAccomnendation not implemented")
 }
 func (UnimplementedReservationServer) mustEmbedUnimplementedReservationServer() {}
@@ -207,7 +207,7 @@ func _Reservation_UpdateReservation_Handler(srv interface{}, ctx context.Context
 }
 
 func _Reservation_DeleteByAccomnendation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRequest)
+	in := new(DeleteRequestaa)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func _Reservation_DeleteByAccomnendation_Handler(srv interface{}, ctx context.Co
 		FullMethod: Reservation_DeleteByAccomnendation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReservationServer).DeleteByAccomnendation(ctx, req.(*DeleteRequest))
+		return srv.(ReservationServer).DeleteByAccomnendation(ctx, req.(*DeleteRequestaa))
 	}
 	return interceptor(ctx, in, info, handler)
 }
