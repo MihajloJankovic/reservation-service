@@ -26,14 +26,11 @@ func isValidDateFormat(dateStr string) bool {
 
 func trimReservationFields(reservation *protos.ReservationResponse) *protos.ReservationResponse {
 	return &protos.ReservationResponse{
-		Id:             reservation.GetId(),
-		Email:          strings.TrimSpace(reservation.GetEmail()),
-		DateFrom:       strings.TrimSpace(reservation.GetDateFrom()),
-		DateTo:         strings.TrimSpace(reservation.GetDateTo()),
-		PricePerson:    reservation.GetPricePerson(),
-		PriceAcc:       reservation.GetPriceAcc(),
-		NumberOfPeople: reservation.GetNumberOfPeople(),
-		Accid:          strings.TrimSpace(reservation.GetAccid()),
+		Id:       reservation.GetId(),
+		Email:    strings.TrimSpace(reservation.GetEmail()),
+		DateFrom: strings.TrimSpace(reservation.GetDateFrom()),
+		DateTo:   strings.TrimSpace(reservation.GetDateTo()),
+		Accid:    strings.TrimSpace(reservation.GetAccid()),
 		// Add trimming for other fields here
 	}
 }

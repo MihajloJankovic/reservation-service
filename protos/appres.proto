@@ -22,10 +22,7 @@ message  ReservationResponse {
   string email = 2;
   string dateFrom = 3;
   string dateTo = 4;
-  int32 pricePerson = 5;
-  int32 priceAcc = 6;
-  int32 numberOfPeople = 7;
-  string accid = 8;
+  string accid = 5;
 
 }
 message  Emptyaa {
