@@ -24,6 +24,7 @@ const (
 	Reservation_SetReservation_FullMethodName         = "/reservation/SetReservation"
 	Reservation_UpdateReservation_FullMethodName      = "/reservation/UpdateReservation"
 	Reservation_DeleteByAccomnendation_FullMethodName = "/reservation/DeleteByAccomnendation"
+	Reservation_CheckActiveReservation_FullMethodName = "/reservation/CheckActiveReservation"
 )
 
 // ReservationClient is the client API for Reservation service.
@@ -35,6 +36,7 @@ type ReservationClient interface {
 	SetReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 	UpdateReservation(ctx context.Context, in *ReservationResponse, opts ...grpc.CallOption) (*Emptyaa, error)
 	DeleteByAccomnendation(ctx context.Context, in *DeleteRequestaa, opts ...grpc.CallOption) (*Emptyaa, error)
+	CheckActiveReservation(ctx context.Context, in *DateFromDateTo, opts ...grpc.CallOption) (*Emptyaa, error)
 }
 
 type reservationClient struct {
@@ -90,6 +92,15 @@ func (c *reservationClient) DeleteByAccomnendation(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *reservationClient) CheckActiveReservation(ctx context.Context, in *DateFromDateTo, opts ...grpc.CallOption) (*Emptyaa, error) {
+	out := new(Emptyaa)
+	err := c.cc.Invoke(ctx, Reservation_CheckActiveReservation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServer is the server API for Reservation service.
 // All implementations must embed UnimplementedReservationServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type ReservationServer interface {
 	SetReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
 	UpdateReservation(context.Context, *ReservationResponse) (*Emptyaa, error)
 	DeleteByAccomnendation(context.Context, *DeleteRequestaa) (*Emptyaa, error)
+	CheckActiveReservation(context.Context, *DateFromDateTo) (*Emptyaa, error)
 	mustEmbedUnimplementedReservationServer()
 }
 
@@ -120,6 +132,9 @@ func (UnimplementedReservationServer) UpdateReservation(context.Context, *Reserv
 }
 func (UnimplementedReservationServer) DeleteByAccomnendation(context.Context, *DeleteRequestaa) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByAccomnendation not implemented")
+}
+func (UnimplementedReservationServer) CheckActiveReservation(context.Context, *DateFromDateTo) (*Emptyaa, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckActiveReservation not implemented")
 }
 func (UnimplementedReservationServer) mustEmbedUnimplementedReservationServer() {}
 
@@ -224,6 +239,24 @@ func _Reservation_DeleteByAccomnendation_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Reservation_CheckActiveReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DateFromDateTo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServer).CheckActiveReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Reservation_CheckActiveReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServer).CheckActiveReservation(ctx, req.(*DateFromDateTo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Reservation_ServiceDesc is the grpc.ServiceDesc for Reservation service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +283,10 @@ var Reservation_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteByAccomnendation",
 			Handler:    _Reservation_DeleteByAccomnendation_Handler,
+		},
+		{
+			MethodName: "CheckActiveReservation",
+			Handler:    _Reservation_CheckActiveReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

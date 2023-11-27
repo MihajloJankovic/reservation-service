@@ -7,7 +7,14 @@ service reservation {
   rpc SetReservation(ReservationResponse) returns (Emptyaa);
   rpc UpdateReservation(ReservationResponse) returns (Emptyaa);
   rpc DeleteByAccomnendation(DeleteRequestaa) returns (Emptyaa);
+  rpc CheckActiveReservation(DateFromDateTo) returns (Emptyaa);
 }
+message DateFromDateTo{
+  string dateFrom = 1;
+  string dateTo = 2;
+  string accid = 3;
+}
+
 message DummyLista {
   repeated ReservationResponse dummy = 1;
 }

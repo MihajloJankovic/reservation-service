@@ -144,6 +144,39 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	return nil
 }
 
+func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	reservationCollection := rr.getCollection()
+
+	// Define the filter to find documents where 'created' is greater than the specified date
+	filter := bson.D{
+		{"dateFrom", bson.D{
+			{"$lte", in.GetDateFrom()},
+		}}, {"accid", in.GetAccid()},
+		{"dateTo", bson.D{
+			{"$gte", in.GetDateTo()},
+		}},
+	}
+	// Perform the find operation
+	reservationCursor, err := reservationCollection.Find(ctx, filter)
+	if err != nil {
+		log.Println(err)
+	}
+	defer reservationCursor.Close(ctx)
+
+	for reservationCursor.Next(ctx) {
+		var reservation protos.ReservationResponse
+		if err := reservationCursor.Decode(&reservation); err != nil {
+			rr.logger.Println(err)
+			return nil, err
+		}
+		return new(protos.Emptyaa), nil
+	}
+	return nil, errors.New("No result")
+}
+
 func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

@@ -34,7 +34,14 @@ func trimReservationFields(reservation *protos.ReservationResponse) *protos.Rese
 		// Add trimming for other fields here
 	}
 }
-
+func (s MyReservationServer) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
+	_, err := s.repo.CheckActiveReservation(ctx, in)
+	if err == nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+	return new(protos.Emptyaa), nil
+}
 func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
 	out, err := s.repo.DeleteByAccomandation(xtx, in)
 	if err != nil {
