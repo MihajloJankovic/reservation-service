@@ -84,7 +84,7 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 	trimmedReservation := trimReservationFields(in)
 
 	// Validate required fields
-	if trimmedReservation.GetId() <= 0 || trimmedReservation.GetEmail() == "" || trimmedReservation.GetDateFrom() == "" || trimmedReservation.GetDateTo() == "" {
+	if trimmedReservation.GetEmail() == "" || trimmedReservation.GetDateFrom() == "" || trimmedReservation.GetDateTo() == "" {
 		return nil, errors.New("Invalid input. Ensure all required fields are provided.")
 	}
 
