@@ -9,6 +9,11 @@ service reservation {
   rpc DeleteByAccomnendation(DeleteRequestaa) returns (Emptyaa);
   rpc CheckActiveReservation(DateFromDateTo) returns (Emptyaa);
   rpc CheckUsersActiveReservation(EmailCheck) returns (Emptyaa);
+  rpc CheckActiveReservationByEmail(Emaill) returns (Emptyaa);
+}
+
+message Emaill{
+  string email = 1;
 }
 message EmailCheck{
   string dateFrom = 1;

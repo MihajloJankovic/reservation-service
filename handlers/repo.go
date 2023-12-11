@@ -144,6 +144,45 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	return nil
 }
 
+// CheckActiveReservationByEmail checks for active reservations based on email.
+func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	reservationCollection := rr.getCollection()
+	currentTime := time.Now()
+
+	// Format the date as YYYY-MM-DD
+	today := currentTime.Format("2006-01-02")
+	// Define the filter to find documents where 'created' is greater than the specified date
+	filter := bson.D{
+		{"dateFrom", bson.D{
+			{"$lte", today},
+		}},
+		{"email", in.GetEmail()},
+		{"dateTo", bson.D{
+			{"$gte", today},
+		}},
+	}
+	// Perform the find operation
+	reservationCursor, err := reservationCollection.Find(ctx, filter)
+	if err != nil {
+		log.Println(err)
+	}
+	defer reservationCursor.Close(ctx)
+
+	for reservationCursor.Next(ctx) {
+		var reservation protos.ReservationResponse
+		if err := reservationCursor.Decode(&reservation); err != nil {
+			rr.logger.Println(err)
+			return nil, err
+		}
+		return new(protos.Emptyaa), nil
+	}
+
+	return nil, errors.New("No result")
+}
+
 func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

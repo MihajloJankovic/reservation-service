@@ -20,6 +20,53 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Emaill struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (x *Emaill) Reset() {
+	*x = Emaill{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_appres_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Emaill) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Emaill) ProtoMessage() {}
+
+func (x *Emaill) ProtoReflect() protoreflect.Message {
+	mi := &file_appres_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Emaill.ProtoReflect.Descriptor instead.
+func (*Emaill) Descriptor() ([]byte, []int) {
+	return file_appres_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Emaill) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
 type EmailCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -33,7 +80,7 @@ type EmailCheck struct {
 func (x *EmailCheck) Reset() {
 	*x = EmailCheck{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[0]
+		mi := &file_appres_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -46,7 +93,7 @@ func (x *EmailCheck) String() string {
 func (*EmailCheck) ProtoMessage() {}
 
 func (x *EmailCheck) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[0]
+	mi := &file_appres_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +106,7 @@ func (x *EmailCheck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailCheck.ProtoReflect.Descriptor instead.
 func (*EmailCheck) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{0}
+	return file_appres_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EmailCheck) GetDateFrom() string {
@@ -96,7 +143,7 @@ type DateFromDateTo struct {
 func (x *DateFromDateTo) Reset() {
 	*x = DateFromDateTo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[1]
+		mi := &file_appres_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -109,7 +156,7 @@ func (x *DateFromDateTo) String() string {
 func (*DateFromDateTo) ProtoMessage() {}
 
 func (x *DateFromDateTo) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[1]
+	mi := &file_appres_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -122,7 +169,7 @@ func (x *DateFromDateTo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DateFromDateTo.ProtoReflect.Descriptor instead.
 func (*DateFromDateTo) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{1}
+	return file_appres_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DateFromDateTo) GetDateFrom() string {
@@ -157,7 +204,7 @@ type DummyLista struct {
 func (x *DummyLista) Reset() {
 	*x = DummyLista{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[2]
+		mi := &file_appres_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -170,7 +217,7 @@ func (x *DummyLista) String() string {
 func (*DummyLista) ProtoMessage() {}
 
 func (x *DummyLista) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[2]
+	mi := &file_appres_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -183,7 +230,7 @@ func (x *DummyLista) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DummyLista.ProtoReflect.Descriptor instead.
 func (*DummyLista) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{2}
+	return file_appres_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DummyLista) GetDummy() []*ReservationResponse {
@@ -204,7 +251,7 @@ type DeleteRequestaa struct {
 func (x *DeleteRequestaa) Reset() {
 	*x = DeleteRequestaa{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[3]
+		mi := &file_appres_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -217,7 +264,7 @@ func (x *DeleteRequestaa) String() string {
 func (*DeleteRequestaa) ProtoMessage() {}
 
 func (x *DeleteRequestaa) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[3]
+	mi := &file_appres_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -230,7 +277,7 @@ func (x *DeleteRequestaa) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRequestaa.ProtoReflect.Descriptor instead.
 func (*DeleteRequestaa) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{3}
+	return file_appres_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeleteRequestaa) GetUid() string {
@@ -251,7 +298,7 @@ type ReservationRequest struct {
 func (x *ReservationRequest) Reset() {
 	*x = ReservationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[4]
+		mi := &file_appres_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -264,7 +311,7 @@ func (x *ReservationRequest) String() string {
 func (*ReservationRequest) ProtoMessage() {}
 
 func (x *ReservationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[4]
+	mi := &file_appres_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -277,7 +324,7 @@ func (x *ReservationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReservationRequest.ProtoReflect.Descriptor instead.
 func (*ReservationRequest) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{4}
+	return file_appres_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ReservationRequest) GetId() int32 {
@@ -302,7 +349,7 @@ type ReservationResponse struct {
 func (x *ReservationResponse) Reset() {
 	*x = ReservationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[5]
+		mi := &file_appres_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -315,7 +362,7 @@ func (x *ReservationResponse) String() string {
 func (*ReservationResponse) ProtoMessage() {}
 
 func (x *ReservationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[5]
+	mi := &file_appres_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -328,7 +375,7 @@ func (x *ReservationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReservationResponse.ProtoReflect.Descriptor instead.
 func (*ReservationResponse) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{5}
+	return file_appres_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ReservationResponse) GetId() int32 {
@@ -375,7 +422,7 @@ type Emptyaa struct {
 func (x *Emptyaa) Reset() {
 	*x = Emptyaa{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_appres_proto_msgTypes[6]
+		mi := &file_appres_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -388,7 +435,7 @@ func (x *Emptyaa) String() string {
 func (*Emptyaa) ProtoMessage() {}
 
 func (x *Emptyaa) ProtoReflect() protoreflect.Message {
-	mi := &file_appres_proto_msgTypes[6]
+	mi := &file_appres_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,13 +448,15 @@ func (x *Emptyaa) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Emptyaa.ProtoReflect.Descriptor instead.
 func (*Emptyaa) Descriptor() ([]byte, []int) {
-	return file_appres_proto_rawDescGZIP(), []int{6}
+	return file_appres_proto_rawDescGZIP(), []int{7}
 }
 
 var File_appres_proto protoreflect.FileDescriptor
 
 var file_appres_proto_rawDesc = []byte{
-	0x0a, 0x0c, 0x61, 0x70, 0x70, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x56,
+	0x0a, 0x0c, 0x61, 0x70, 0x70, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x1e,
+	0x0a, 0x06, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69,
+	0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x56,
 	0x0a, 0x0a, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x1a, 0x0a, 0x08,
 	0x64, 0x61, 0x74, 0x65, 0x46, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
 	0x64, 0x61, 0x74, 0x65, 0x46, 0x72, 0x6f, 0x6d, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x61, 0x74, 0x65,
@@ -436,7 +485,7 @@ var file_appres_proto_rawDesc = []byte{
 	0x6d, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x61, 0x74, 0x65, 0x54, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x06, 0x64, 0x61, 0x74, 0x65, 0x54, 0x6f, 0x12, 0x14, 0x0a, 0x05, 0x61, 0x63, 0x63,
 	0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x61, 0x63, 0x63, 0x69, 0x64, 0x22,
-	0x09, 0x0a, 0x07, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x61, 0x61, 0x32, 0xf6, 0x02, 0x0a, 0x0b, 0x72,
+	0x09, 0x0a, 0x07, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x61, 0x61, 0x32, 0xaa, 0x03, 0x0a, 0x0b, 0x72,
 	0x65, 0x73, 0x65, 0x72, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x32, 0x0a, 0x0e, 0x47, 0x65,
 	0x74, 0x52, 0x65, 0x73, 0x65, 0x72, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x13, 0x2e, 0x52,
 	0x65, 0x73, 0x65, 0x72, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
@@ -460,8 +509,11 @@ var file_appres_proto_rawDesc = []byte{
 	0x1b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x73, 0x65, 0x72, 0x73, 0x41, 0x63, 0x74, 0x69, 0x76,
 	0x65, 0x52, 0x65, 0x73, 0x65, 0x72, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0b, 0x2e, 0x45,
 	0x6d, 0x61, 0x69, 0x6c, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x1a, 0x08, 0x2e, 0x45, 0x6d, 0x70, 0x74,
-	0x79, 0x61, 0x61, 0x42, 0x0d, 0x5a, 0x0b, 0x2e, 0x2e, 0x2f, 0x67, 0x65, 0x6e, 0x66, 0x69, 0x6c,
-	0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x79, 0x61, 0x61, 0x12, 0x32, 0x0a, 0x1d, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x63, 0x74, 0x69,
+	0x76, 0x65, 0x52, 0x65, 0x73, 0x65, 0x72, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x45,
+	0x6d, 0x61, 0x69, 0x6c, 0x12, 0x07, 0x2e, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x6c, 0x1a, 0x08, 0x2e,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x61, 0x61, 0x42, 0x0d, 0x5a, 0x0b, 0x2e, 0x2e, 0x2f, 0x67, 0x65,
+	0x6e, 0x66, 0x69, 0x6c, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -476,34 +528,37 @@ func file_appres_proto_rawDescGZIP() []byte {
 	return file_appres_proto_rawDescData
 }
 
-var file_appres_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_appres_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_appres_proto_goTypes = []interface{}{
-	(*EmailCheck)(nil),          // 0: EmailCheck
-	(*DateFromDateTo)(nil),      // 1: DateFromDateTo
-	(*DummyLista)(nil),          // 2: DummyLista
-	(*DeleteRequestaa)(nil),     // 3: DeleteRequestaa
-	(*ReservationRequest)(nil),  // 4: ReservationRequest
-	(*ReservationResponse)(nil), // 5: ReservationResponse
-	(*Emptyaa)(nil),             // 6: Emptyaa
+	(*Emaill)(nil),              // 0: Emaill
+	(*EmailCheck)(nil),          // 1: EmailCheck
+	(*DateFromDateTo)(nil),      // 2: DateFromDateTo
+	(*DummyLista)(nil),          // 3: DummyLista
+	(*DeleteRequestaa)(nil),     // 4: DeleteRequestaa
+	(*ReservationRequest)(nil),  // 5: ReservationRequest
+	(*ReservationResponse)(nil), // 6: ReservationResponse
+	(*Emptyaa)(nil),             // 7: Emptyaa
 }
 var file_appres_proto_depIdxs = []int32{
-	5, // 0: DummyLista.dummy:type_name -> ReservationResponse
-	4, // 1: reservation.GetReservation:input_type -> ReservationRequest
-	6, // 2: reservation.GetAllReservations:input_type -> Emptyaa
-	5, // 3: reservation.SetReservation:input_type -> ReservationResponse
-	5, // 4: reservation.UpdateReservation:input_type -> ReservationResponse
-	3, // 5: reservation.DeleteByAccomnendation:input_type -> DeleteRequestaa
-	1, // 6: reservation.CheckActiveReservation:input_type -> DateFromDateTo
-	0, // 7: reservation.CheckUsersActiveReservation:input_type -> EmailCheck
-	2, // 8: reservation.GetReservation:output_type -> DummyLista
-	2, // 9: reservation.GetAllReservations:output_type -> DummyLista
-	6, // 10: reservation.SetReservation:output_type -> Emptyaa
-	6, // 11: reservation.UpdateReservation:output_type -> Emptyaa
-	6, // 12: reservation.DeleteByAccomnendation:output_type -> Emptyaa
-	6, // 13: reservation.CheckActiveReservation:output_type -> Emptyaa
-	6, // 14: reservation.CheckUsersActiveReservation:output_type -> Emptyaa
-	8, // [8:15] is the sub-list for method output_type
-	1, // [1:8] is the sub-list for method input_type
+	6, // 0: DummyLista.dummy:type_name -> ReservationResponse
+	5, // 1: reservation.GetReservation:input_type -> ReservationRequest
+	7, // 2: reservation.GetAllReservations:input_type -> Emptyaa
+	6, // 3: reservation.SetReservation:input_type -> ReservationResponse
+	6, // 4: reservation.UpdateReservation:input_type -> ReservationResponse
+	4, // 5: reservation.DeleteByAccomnendation:input_type -> DeleteRequestaa
+	2, // 6: reservation.CheckActiveReservation:input_type -> DateFromDateTo
+	1, // 7: reservation.CheckUsersActiveReservation:input_type -> EmailCheck
+	0, // 8: reservation.CheckActiveReservationByEmail:input_type -> Emaill
+	3, // 9: reservation.GetReservation:output_type -> DummyLista
+	3, // 10: reservation.GetAllReservations:output_type -> DummyLista
+	7, // 11: reservation.SetReservation:output_type -> Emptyaa
+	7, // 12: reservation.UpdateReservation:output_type -> Emptyaa
+	7, // 13: reservation.DeleteByAccomnendation:output_type -> Emptyaa
+	7, // 14: reservation.CheckActiveReservation:output_type -> Emptyaa
+	7, // 15: reservation.CheckUsersActiveReservation:output_type -> Emptyaa
+	7, // 16: reservation.CheckActiveReservationByEmail:output_type -> Emptyaa
+	9, // [9:17] is the sub-list for method output_type
+	1, // [1:9] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -516,7 +571,7 @@ func file_appres_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_appres_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EmailCheck); i {
+			switch v := v.(*Emaill); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -528,7 +583,7 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DateFromDateTo); i {
+			switch v := v.(*EmailCheck); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -540,7 +595,7 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DummyLista); i {
+			switch v := v.(*DateFromDateTo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -552,7 +607,7 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteRequestaa); i {
+			switch v := v.(*DummyLista); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -564,7 +619,7 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ReservationRequest); i {
+			switch v := v.(*DeleteRequestaa); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -576,7 +631,7 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ReservationResponse); i {
+			switch v := v.(*ReservationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -588,6 +643,18 @@ func file_appres_proto_init() {
 			}
 		}
 		file_appres_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReservationResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_appres_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Emptyaa); i {
 			case 0:
 				return &v.state
@@ -606,7 +673,7 @@ func file_appres_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_appres_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
