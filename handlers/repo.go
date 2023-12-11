@@ -143,6 +143,20 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	rr.logger.Printf("Documents ID: %v\n", result.InsertedID)
 	return nil
 }
+func (rr *ReservationRepo) DeleteReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resCollection := rr.getCollection()
+
+	filter := bson.M{"email": in.GetEmail()}
+	_, err := resCollection.DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, errors.New("Couldn't delete")
+	}
+
+	return new(protos.Emptyaa), nil
+}
 
 // CheckActiveReservationByEmail checks for active reservations based on email.
 func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {

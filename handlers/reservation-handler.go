@@ -34,6 +34,14 @@ func trimReservationFields(reservation *protos.ReservationResponse) *protos.Rese
 		// Add trimming for other fields here
 	}
 }
+func (s MyReservationServer) DeleteReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+	out, err := s.repo.DeleteReservationByEmail(ctx, in)
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+	return out, nil
+}
 
 func (s MyReservationServer) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 	_, err := s.repo.CheckActiveReservationByEmail(ctx, in)

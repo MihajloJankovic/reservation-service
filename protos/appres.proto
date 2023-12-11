@@ -10,6 +10,7 @@ service reservation {
   rpc CheckActiveReservation(DateFromDateTo) returns (Emptyaa);
   rpc CheckUsersActiveReservation(EmailCheck) returns (Emptyaa);
   rpc CheckActiveReservationByEmail(Emaill) returns (Emptyaa);
+  rpc DeleteReservationByEmail(Emaill) returns (Emptyaa);
 }
 
 message Emaill{
