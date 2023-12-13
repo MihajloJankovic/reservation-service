@@ -11,6 +11,7 @@ service reservation {
   rpc CheckUsersActiveReservation(EmailCheck) returns (Emptyaa);
   rpc CheckActiveReservationByEmail(Emaill) returns (Emptyaa);
   rpc DeleteReservationByEmail(Emaill) returns (Emptyaa);
+  rpc GetAllReservationsByEmail(Emaill) returns (DummyLista);
 }
 
 message Emaill{

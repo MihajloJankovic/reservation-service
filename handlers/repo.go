@@ -99,7 +99,6 @@ func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, err
 	reservationCollection := rr.getCollection()
 	var reservationsSlice []*protos.ReservationResponse
 
-	// Assuming you have a filter based on the email, modify the filter as needed
 	filter := bson.M{"id": id}
 
 	reservationCursor, err := reservationCollection.Find(ctx, filter)
@@ -143,6 +142,40 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	rr.logger.Printf("Documents ID: %v\n", result.InsertedID)
 	return nil
 }
+
+func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *protos.Emaill) (*protos.DummyLista, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	reservationCollection := rr.getCollection()
+
+	filter := bson.M{"email": in.GetEmail()}
+
+	reservationCursor, err := reservationCollection.Find(ctx, filter)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer reservationCursor.Close(ctx)
+
+	var lista protos.DummyLista
+	for reservationCursor.Next(ctx) {
+		var reservation protos.ReservationResponse
+		if err := reservationCursor.Decode(&reservation); err != nil {
+			rr.logger.Println(err)
+			return nil, err
+		}
+		lista.Dummy = append(lista.Dummy, &reservation)
+	}
+
+	if err := reservationCursor.Err(); err != nil {
+		rr.logger.Println(err)
+		return nil, err
+	}
+
+	return &lista, nil
+}
+
 func (rr *ReservationRepo) DeleteReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -158,7 +191,6 @@ func (rr *ReservationRepo) DeleteReservationByEmail(ctx context.Context, in *pro
 	return new(protos.Emptyaa), nil
 }
 
-// CheckActiveReservationByEmail checks for active reservations based on email.
 func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -166,9 +198,8 @@ func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in
 	reservationCollection := rr.getCollection()
 	currentTime := time.Now()
 
-	// Format the date as YYYY-MM-DD
 	today := currentTime.Format("2006-01-02")
-	// Define the filter to find documents where 'created' is greater than the specified date
+
 	filter := bson.D{
 		{"dateFrom", bson.D{
 			{"$lte", today},
@@ -178,7 +209,7 @@ func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in
 			{"$gte", today},
 		}},
 	}
-	// Perform the find operation
+
 	reservationCursor, err := reservationCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println(err)
@@ -203,7 +234,6 @@ func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *proto
 
 	reservationCollection := rr.getCollection()
 
-	// Define the filter to find documents where 'created' is greater than the specified date
 	filter := bson.D{
 		{"dateFrom", bson.D{
 			{"$lte", in.GetDateFrom()},
@@ -212,7 +242,7 @@ func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *proto
 			{"$gte", in.GetDateTo()},
 		}},
 	}
-	// Perform the find operation
+
 	reservationCursor, err := reservationCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println(err)
