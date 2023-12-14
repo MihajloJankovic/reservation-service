@@ -142,7 +142,40 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 	rr.logger.Printf("Documents ID: %v\n", result.InsertedID)
 	return nil
 }
+func (rr *ReservationRepo) CheckIfAvaible(profile *protos.ReservationResponse) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
+	reservationCollection := rr.getCollection()
+
+	filter := bson.D{
+		{"dateFrom", bson.D{
+			{"$gte", profile.DateFrom},
+			{"$lte", profile.DateTo},
+		}},
+		{"dateTo", bson.D{
+			{"$gte", profile.DateFrom},
+			{"$lte", profile.DateTo},
+		}},
+	}
+
+	reservationCursor, err := reservationCollection.Find(ctx, filter)
+	if err != nil {
+		log.Println(err)
+	}
+	defer reservationCursor.Close(ctx)
+
+	for reservationCursor.Next(ctx) {
+		var reservation protos.ReservationResponse
+		if err := reservationCursor.Decode(&reservation); err != nil {
+			rr.logger.Println(err)
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("there is active reservation for this date range")
+}
 func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *protos.Emaill) (*protos.DummyLista, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

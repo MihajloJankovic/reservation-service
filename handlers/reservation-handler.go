@@ -113,25 +113,35 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 	if trimmedReservation.GetEmail() == "" || trimmedReservation.GetDateFrom() == "" || trimmedReservation.GetDateTo() == "" {
 		return nil, errors.New("Invalid input. Ensure all required fields are provided.")
 	}
-
-	// Convert date strings to time.Time
-	dateFrom, err := time.Parse("2006-01-02", trimmedReservation.GetDateFrom())
+	parsedTime1, err := time.Parse(time.RFC3339, trimmedReservation.GetDateFrom())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateFrom. Use yyyy-mm-dd.")
 	}
-
-	dateTo, err := time.Parse("2006-01-02", trimmedReservation.GetDateTo())
+	parsedTime2, err := time.Parse(time.RFC3339, trimmedReservation.GetDateTo())
 	if err != nil {
 		return nil, errors.New("Invalid date format for DateTo. Use yyyy-mm-dd.")
 	}
+	formattedDate1 := parsedTime1.Format("2006-01-02")
+	formattedDate2 := parsedTime2.Format("2006-01-02")
+	// Convert date strings to time.Time
+	dateFrom := formattedDate1
+	dateTo := formattedDate2
+	trimmedReservation.DateFrom = dateFrom
+	trimmedReservation.DateTo = dateTo
+	parsedTime3, _ := time.Parse(time.RFC3339, formattedDate1)
 
+	parsedTime4, _ := time.Parse(time.RFC3339, formattedDate2)
 	// Validate date range
-	if dateFrom.After(dateTo) {
+	if parsedTime3.After(parsedTime4) {
 		return nil, errors.New("Invalid date range. DateFrom must be before DateTo.")
 	}
 
 	// Additional validation for other fields if needed
-
+	err = s.repo.CheckIfAvaible(trimmedReservation)
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
 	err = s.repo.Create(trimmedReservation)
 	if err != nil {
 		s.logger.Println(err)
