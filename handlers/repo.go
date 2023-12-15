@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -229,9 +230,13 @@ func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos
 	defer cancel()
 
 	resCollection := rr.getCollection()
-
-	filter := bson.M{"id": in.GetEmail()}
-	_, err := resCollection.DeleteMany(ctx, filter)
+	log.Println(in.GetEmail())
+	i, err := strconv.Atoi(in.GetEmail())
+	if err != nil {
+		log.Println(in.GetEmail())
+	}
+	filter := bson.M{"id": i}
+	_, err = resCollection.DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, errors.New("Couldn't delete")
 	}
