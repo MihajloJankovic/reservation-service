@@ -149,11 +149,11 @@ func (rr *ReservationRepo) CheckIfAvaible(profile *protos.ReservationResponse) e
 	reservationCollection := rr.getCollection()
 
 	filter := bson.D{
-		{"dateFrom", bson.D{
+		{"datefrom", bson.D{
 			{"$gte", profile.DateFrom},
 			{"$lte", profile.DateTo},
 		}},
-		{"dateTo", bson.D{
+		{"dateto", bson.D{
 			{"$gte", profile.DateFrom},
 			{"$lte", profile.DateTo},
 		}},
@@ -230,69 +230,74 @@ func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in
 	defer cancel()
 
 	reservationCollection := rr.getCollection()
-	currentTime := time.Now()
 
-	today := currentTime.Format("2006-01-02")
-
+	layout := "2006-01-02"
 	filter := bson.D{
-		{"dateFrom", bson.D{
-			{"$lte", today},
+		{"datefrom", bson.D{
+			{"$lte", time.Now().Format(layout)},
 		}},
 		{"email", in.GetEmail()},
-		{"dateTo", bson.D{
-			{"$gte", today},
+		{"dateto", bson.D{
+			{"$gte", time.Now().Format(layout)},
 		}},
 	}
 
 	reservationCursor, err := reservationCollection.Find(ctx, filter)
 	if err != nil {
-		log.Println(err)
+		rr.logger.Println("Error querying MongoDB:", err)
+		return nil, err
 	}
 	defer reservationCursor.Close(ctx)
 
-	for reservationCursor.Next(ctx) {
+	// Check if any active reservation was found
+	if reservationCursor.Next(ctx) {
 		var reservation protos.ReservationResponse
 		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println(err)
+			rr.logger.Println("Error decoding result:", err)
 			return nil, err
 		}
 		return new(protos.Emptyaa), nil
 	}
 
-	return nil, errors.New("No result")
+	// No active reservation found
+	return nil, errors.New("No active reservation found")
 }
-
 func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	reservationCollection := rr.getCollection()
 
+	layout := "2006-01-02"
 	filter := bson.D{
-		{"dateFrom", bson.D{
-			{"$lte", in.GetDateFrom()},
-		}}, {"accid", in.GetAccid()},
-		{"dateTo", bson.D{
-			{"$gte", in.GetDateTo()},
+		{"datefrom", bson.D{
+			{"$lte", time.Now().Format(layout)},
+		}},
+		{"accid", in.GetAccid()},
+		{"dateto", bson.D{
+			{"$gte", time.Now().Format(layout)},
 		}},
 	}
 
 	reservationCursor, err := reservationCollection.Find(ctx, filter)
 	if err != nil {
-		log.Println(err)
+		rr.logger.Println("Error querying MongoDB:", err)
+		return nil, err
 	}
 	defer reservationCursor.Close(ctx)
 
-	for reservationCursor.Next(ctx) {
+	// Check if any active reservation was found
+	if reservationCursor.Next(ctx) {
 		var reservation protos.ReservationResponse
 		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println(err)
+			rr.logger.Println("Error decoding result:", err)
 			return nil, err
 		}
 		return new(protos.Emptyaa), nil
-
 	}
-	return nil, errors.New("No result")
+
+	// No active reservation found
+	return nil, errors.New("No active reservation found")
 }
 
 func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error {

@@ -55,16 +55,15 @@ func (s MyReservationServer) GetAllReservationsByEmail(ctx context.Context, in *
 func (s MyReservationServer) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 	_, err := s.repo.CheckActiveReservationByEmail(ctx, in)
 	if err == nil {
-		s.logger.Println(err)
-		return nil, err
+		return nil, errors.New("there is active reservation")
 	}
 	return new(protos.Emptyaa), nil
 }
 func (s MyReservationServer) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
+
 	_, err := s.repo.CheckActiveReservation(ctx, in)
 	if err == nil {
-		s.logger.Println(err)
-		return nil, err
+		return nil, errors.New("there is active reservation")
 	}
 	return new(protos.Emptyaa), nil
 }
