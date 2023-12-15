@@ -171,10 +171,11 @@ func (rr *ReservationRepo) CheckIfAvaible(profile *protos.ReservationResponse) e
 			rr.logger.Println(err)
 			return err
 		}
-		return nil
+		return errors.New("there is active reservation for this date range")
+
 	}
 
-	return errors.New("there is active reservation for this date range")
+	return nil
 }
 func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *protos.Emaill) (*protos.DummyLista, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
