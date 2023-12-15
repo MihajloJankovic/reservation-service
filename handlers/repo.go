@@ -224,6 +224,20 @@ func (rr *ReservationRepo) DeleteReservationByEmail(ctx context.Context, in *pro
 
 	return new(protos.Emptyaa), nil
 }
+func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resCollection := rr.getCollection()
+
+	filter := bson.M{"id": in.GetEmail()}
+	_, err := resCollection.DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, errors.New("Couldn't delete")
+	}
+
+	return new(protos.Emptyaa), nil
+}
 
 func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
