@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	protosava "github.com/MihajloJankovic/Aviability-Service/protos/main"
 	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
 	"log"
 	"strings"
@@ -13,10 +14,11 @@ type MyReservationServer struct {
 	protos.UnimplementedReservationServer
 	logger *log.Logger
 	repo   *ReservationRepo
+	cc     protosava.AccommodationAviabilityClient
 }
 
-func NewServer(l *log.Logger, r *ReservationRepo) *MyReservationServer {
-	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r}
+func NewServer(l *log.Logger, r *ReservationRepo,cc protosava.AccommodationAviabilityClient) *MyReservationServer {
+	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r,cc}
 }
 
 func isValidDateFormat(dateStr string) bool {
@@ -143,6 +145,16 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 		return nil, errors.New("Invalid date range. DateFrom must be before DateTo.")
 	}
 
+	temp := new(protosava.CheckRequest)
+	temp.Id = in.GetAccid()
+	temp.From = dateFrom
+	temp.To = dateTo
+
+	_, err = s.cc.GetAccommodationCheck(context.Background(), temp)
+	if err != nil {
+		log.Printf("RPC failed: %v\n", err)
+		return nil,err
+	}
 	// Additional validation for other fields if needed
 	err = s.repo.CheckIfAvaible(trimmedReservation)
 	if err != nil {

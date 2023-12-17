@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	protosava "github.com/MihajloJankovic/Aviability-Service/protos/main"
 	"github.com/MihajloJankovic/reservation-service/handlers"
 	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
 	"os"
@@ -40,7 +42,19 @@ func main() {
 	reservationRepo.Ping()
 
 	//Initialize the handler and inject said logger
-	service := handlers.NewServer(logger, reservationRepo)
+	connAva, err := grpc.Dial("avaibility-service:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	defer func(conn *grpc.ClientConn) {
+		err := conn.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(connAva)
+
+	ccava := protosava.NewAccommodationAviabilityClient(connAva)
+	service := handlers.NewServer(logger, reservationRepo,ccava)
 
 	protos.RegisterReservationServer(serverRegister, service)
 	err = serverRegister.Serve(lis)
