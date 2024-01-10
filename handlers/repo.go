@@ -4,206 +4,224 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"os"
-	"strconv"
 	"time"
+
+	protos "github.com/MihajloJankovic/reservation-service/protos/genfiles"
+	"github.com/gocql/gocql"
 )
 
 type ReservationRepo struct {
-	logger *log.Logger
-	cli    *mongo.Client
+	logger  *log.Logger
+	session *gocql.Session
 }
 
 // New NoSQL: Constructor which reads db configuration from environment
 func New(ctx context.Context, logger *log.Logger) (*ReservationRepo, error) {
-	dburi := os.Getenv("MONGO_DB_URI")
+	db := os.Getenv("CASS_DB")
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dburi))
+	// Connect to default keyspace
+	cluster := gocql.NewCluster(db)
+	cluster.Keyspace = "system"
+	session, err := cluster.CreateSession()
 	if err != nil {
+		logger.Println(err)
+		return nil, err
+	}
+	defer session.Close()
+
+	// Create 'reservation' keyspace
+	err = session.Query(
+		fmt.Sprintf(`CREATE KEYSPACE IF NOT EXISTS %s
+					WITH replication = {
+						'class' : 'SimpleStrategy',
+						'replication_factor' : %d
+					}`, "reservation", 1)).Exec()
+	if err != nil {
+		logger.Println(err)
+	}
+
+	// Connect to reservation keyspace
+	cluster.Keyspace = "reservation"
+	cluster.Consistency = gocql.One
+	session, err = cluster.CreateSession()
+	if err != nil {
+		logger.Println(err)
 		return nil, err
 	}
 
+	// Create 'reservations' table
+	err = session.Query(
+		`CREATE TABLE IF NOT EXISTS reservations (
+			id UUID PRIMARY KEY,
+			accid UUID,
+			email text,
+			datefrom date,
+			dateto date
+		)`).Exec()
+	if err != nil {
+		logger.Println(err)
+	}
+
+	// Return repository with logger and DB session
 	return &ReservationRepo{
-		cli:    client,
-		logger: logger,
+		session: session,
+		logger:  logger,
 	}, nil
 }
 
 // Disconnect from database
-func (rr *ReservationRepo) Disconnect(ctx context.Context) error {
-	err := rr.cli.Disconnect(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
+func (rr *ReservationRepo) Disconnect(ctx context.Context) {
+	rr.session.Close()
 }
 
-// Ping Check database connection
-func (rr *ReservationRepo) Ping() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// Check connection -> if no error, connection is established
-	err := rr.cli.Ping(ctx, readpref.Primary())
-	if err != nil {
-		rr.logger.Println(err)
-	}
-	// Print available databases
-	databases, err := rr.cli.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		rr.logger.Println(err)
-	}
-	fmt.Println(databases)
-}
 func (rr *ReservationRepo) GetAll() ([]*protos.ReservationResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	session := rr.session
 
-	reservationCollection := rr.getCollection()
 	var reservationsSlice []*protos.ReservationResponse
 
-	reservationCursor, err := reservationCollection.Find(ctx, bson.M{})
-	if err != nil {
+	query := "SELECT id, accid, email, datefrom, dateto FROM reservations ALLOW FILTERING"
+	iter := session.Query(query).Iter()
+
+	var reservation protos.ReservationResponse
+	for iter.Scan(
+		&reservation.Id,
+		&reservation.Accid,
+		&reservation.Email,
+		&reservation.DateFrom,
+		&reservation.DateTo,
+	) {
+		// Create a new instance for each row
+		currentReservation := &protos.ReservationResponse{
+			Id:       reservation.Id,
+			Accid:    reservation.Accid,
+			Email:    reservation.Email,
+			DateFrom: reservation.DateFrom,
+			DateTo:   reservation.DateTo,
+		}
+
+		// Append the new instance to the slice
+		reservationsSlice = append(reservationsSlice, currentReservation)
+	}
+
+	if err := iter.Close(); err != nil {
 		rr.logger.Println(err)
 		return nil, err
 	}
-	if err = reservationCursor.All(ctx, &reservationsSlice); err != nil {
-		rr.logger.Println(err)
-		return nil, err
-	}
+
 	return reservationsSlice, nil
 }
-func (pr *ReservationRepo) DeleteByAccomandation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	resCollection := pr.getCollection()
-
-	filter := bson.M{"accid": in.GetUid()}
-	_, err := resCollection.DeleteMany(ctx, filter)
-	if err != nil {
-		return nil, errors.New("Coundnt delete")
+func (rr *ReservationRepo) DeleteByAccommodation(ctx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
+	query := "DELETE FROM reservations WHERE accid = ?"
+	if err := rr.session.Query(query, in.GetUid()).Exec(); err != nil {
+		rr.logger.Println(err)
+		return nil, errors.New("Couldn't delete")
 	}
 
 	return new(protos.Emptyaa), nil
 }
+
 func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	query := "SELECT id, accid, email, datefrom, dateto FROM reservations WHERE id = ? ALLOW FILTERING"
+	iter := rr.session.Query(query, id).Iter()
 
-	reservationCollection := rr.getCollection()
 	var reservationsSlice []*protos.ReservationResponse
-
-	filter := bson.M{"id": id}
-
-	reservationCursor, err := reservationCollection.Find(ctx, filter)
-	if err != nil {
-		rr.logger.Println(err)
-		return nil, err
-	}
-	defer func(reservationCursor *mongo.Cursor, ctx context.Context) {
-		err := reservationCursor.Close(ctx)
-		if err != nil {
-			rr.logger.Println(err)
+	var reservation protos.ReservationResponse
+	for iter.Scan(
+		&reservation.Id,
+		&reservation.Accid,
+		&reservation.Email,
+		&reservation.DateFrom,
+		&reservation.DateTo,
+	) {
+		// Create a new instance for each row
+		currentReservation := &protos.ReservationResponse{
+			Id:       reservation.Id,
+			Accid:    reservation.Accid,
+			Email:    reservation.Email,
+			DateFrom: reservation.DateFrom,
+			DateTo:   reservation.DateTo,
 		}
-	}(reservationCursor, ctx)
 
-	for reservationCursor.Next(ctx) {
-		var reservation protos.ReservationResponse
-		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println(err)
-			return nil, err
-		}
-		reservationsSlice = append(reservationsSlice, &reservation)
+		// Append the new instance to the slice
+		reservationsSlice = append(reservationsSlice, currentReservation)
 	}
 
-	if err := reservationCursor.Err(); err != nil {
+	if err := iter.Close(); err != nil {
 		rr.logger.Println(err)
 		return nil, err
 	}
 
 	return reservationsSlice, nil
 }
-func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	accommodationCollection := rr.getCollection()
 
-	result, err := accommodationCollection.InsertOne(ctx, &profile)
+func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
+	query := "INSERT INTO reservations (id, accid, email, datefrom, dateto) VALUES (?, ?, ?, ?, ?) ALLOW FILTERING"
+
+	err := rr.session.Query(query,
+		profile.Id,
+		profile.Accid,
+		profile.Email,
+		profile.DateFrom,
+		profile.DateTo,
+	).Exec()
+
 	if err != nil {
-		rr.logger.Println(err)
+		rr.logger.Println("Error inserting reservation record:", err)
 		return err
 	}
-	rr.logger.Printf("Documents ID: %v\n", result.InsertedID)
+
 	return nil
 }
-func (rr *ReservationRepo) CheckIfAvaible(profile *protos.ReservationResponse) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	reservationCollection := rr.getCollection()
+func (rr *ReservationRepo) CheckIfAvailable(profile *protos.ReservationResponse) error {
 
-	filter := bson.D{
-		{"datefrom", bson.D{
-			{"$gte", profile.DateFrom},
-			{"$lte", profile.DateTo},
-		}},
-		{"dateto", bson.D{
-			{"$gte", profile.DateFrom},
-			{"$lte", profile.DateTo},
-		}},
-	}
+	query := "SELECT id FROM reservations WHERE accid = ? AND ((datefrom <= ? AND dateto >= ?) OR (datefrom <= ? AND dateto >= ?)) ALLOW FILTERING"
+	iter := rr.session.Query(query,
+		profile.Accid,
+		profile.DateFrom,
+		profile.DateFrom,
+		profile.DateTo,
+		profile.DateTo,
+	).Iter()
 
-	reservationCursor, err := reservationCollection.Find(ctx, filter)
-	if err != nil {
-		log.Println(err)
-	}
-	defer reservationCursor.Close(ctx)
-
-	for reservationCursor.Next(ctx) {
-		var reservation protos.ReservationResponse
-		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println(err)
-			return err
-		}
-		return errors.New("there is active reservation for this date range")
-
+	if iter.NumRows() > 0 {
+		rr.logger.Println("Reservation not available for the specified date range")
+		return errors.New("Reservation not available for the specified date range")
 	}
 
 	return nil
 }
+
 func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *protos.Emaill) (*protos.DummyLista, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	reservationCollection := rr.getCollection()
-
-	filter := bson.M{"email": in.GetEmail()}
-
-	reservationCursor, err := reservationCollection.Find(ctx, filter)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer reservationCursor.Close(ctx)
+	query := "SELECT id, accid, email, datefrom, dateto FROM reservations WHERE email = ? ALLOW FILTERING"
+	iter := rr.session.Query(query, in.GetEmail()).Iter()
 
 	var lista protos.DummyLista
-	for reservationCursor.Next(ctx) {
-		var reservation protos.ReservationResponse
-		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println(err)
-			return nil, err
+	var reservation protos.ReservationResponse
+	for iter.Scan(
+		&reservation.Id,
+		&reservation.Accid,
+		&reservation.Email,
+		&reservation.DateFrom,
+		&reservation.DateTo,
+	) {
+		// Create a new instance for each row
+		currentReservation := &protos.ReservationResponse{
+			Id:       reservation.Id,
+			Accid:    reservation.Accid,
+			Email:    reservation.Email,
+			DateFrom: reservation.DateFrom,
+			DateTo:   reservation.DateTo,
 		}
-		lista.Dummy = append(lista.Dummy, &reservation)
+
+		// Append the new instance to the slice
+		lista.Dummy = append(lista.Dummy, currentReservation)
 	}
 
-	if err := reservationCursor.Err(); err != nil {
+	if err := iter.Close(); err != nil {
 		rr.logger.Println(err)
 		return nil, err
 	}
@@ -212,32 +230,19 @@ func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *proto
 }
 
 func (rr *ReservationRepo) DeleteReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	resCollection := rr.getCollection()
-
-	filter := bson.M{"email": in.GetEmail()}
-	_, err := resCollection.DeleteMany(ctx, filter)
-	if err != nil {
+	query := "DELETE FROM reservations WHERE email = ?"
+	if err := rr.session.Query(query, in.GetEmail()).Exec(); err != nil {
+		rr.logger.Println(err)
 		return nil, errors.New("Couldn't delete")
 	}
 
 	return new(protos.Emptyaa), nil
 }
-func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	resCollection := rr.getCollection()
-	log.Println(in.GetEmail())
-	i, err := strconv.Atoi(in.GetEmail())
-	if err != nil {
-		log.Println(in.GetEmail())
-	}
-	filter := bson.M{"id": i}
-	_, err = resCollection.DeleteMany(ctx, filter)
-	if err != nil {
+func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+	query := "DELETE FROM reservations WHERE id = ?"
+	if err := rr.session.Query(query, in.GetEmail()).Exec(); err != nil {
+		rr.logger.Println(err)
 		return nil, errors.New("Couldn't delete")
 	}
 
@@ -245,103 +250,49 @@ func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos
 }
 
 func (rr *ReservationRepo) CheckActiveReservationByEmail(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	reservationCollection := rr.getCollection()
-
 	layout := "2006-01-02"
-	filter := bson.D{
-		{"datefrom", bson.D{
-			{"$lte", time.Now().Format(layout)},
-		}},
-		{"email", in.GetEmail()},
-		{"dateto", bson.D{
-			{"$gte", time.Now().Format(layout)},
-		}},
-	}
+	query := "SELECT id FROM reservations WHERE email = ? AND datefrom <= ? AND dateto >= ? ALLOW FILTERING"
+	iter := rr.session.Query(query,
+		in.GetEmail(),
+		time.Now().Format(layout),
+		time.Now().Format(layout),
+	).Iter()
 
-	reservationCursor, err := reservationCollection.Find(ctx, filter)
-	if err != nil {
-		rr.logger.Println("Error querying MongoDB:", err)
-		return nil, err
-	}
-	defer reservationCursor.Close(ctx)
-
-	// Check if any active reservation was found
-	if reservationCursor.Next(ctx) {
-		var reservation protos.ReservationResponse
-		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println("Error decoding result:", err)
-			return nil, err
-		}
+	if iter.NumRows() > 0 {
+		rr.logger.Println("Active reservation found for the specified date range")
 		return new(protos.Emptyaa), nil
 	}
 
-	// No active reservation found
 	return nil, errors.New("No active reservation found")
 }
+
 func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *protos.DateFromDateTo) (*protos.Emptyaa, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	reservationCollection := rr.getCollection()
-
 	layout := "2006-01-02"
-	filter := bson.D{
-		{"datefrom", bson.D{
-			{"$lte", time.Now().Format(layout)},
-		}},
-		{"accid", in.GetAccid()},
-		{"dateto", bson.D{
-			{"$gte", time.Now().Format(layout)},
-		}},
-	}
+	query := "SELECT id FROM reservations WHERE accid = ? AND datefrom <= ? AND dateto >= ? ALLOW FILTERING"
+	iter := rr.session.Query(query,
+		in.GetAccid(),
+		time.Now().Format(layout),
+		time.Now().Format(layout),
+	).Iter()
 
-	reservationCursor, err := reservationCollection.Find(ctx, filter)
-	if err != nil {
-		rr.logger.Println("Error querying MongoDB:", err)
-		return nil, err
-	}
-	defer reservationCursor.Close(ctx)
-
-	// Check if any active reservation was found
-	if reservationCursor.Next(ctx) {
-		var reservation protos.ReservationResponse
-		if err := reservationCursor.Decode(&reservation); err != nil {
-			rr.logger.Println("Error decoding result:", err)
-			return nil, err
-		}
+	if iter.NumRows() > 0 {
+		rr.logger.Println("Active reservation found for the specified date range")
 		return new(protos.Emptyaa), nil
 	}
 
-	// No active reservation found
 	return nil, errors.New("No active reservation found")
 }
 
 func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	reservationCollection := rr.getCollection()
-
-	filter := bson.M{"id": reservation.GetId()}
-	update := bson.M{"$set": bson.M{
-		"dateFrom": reservation.GetDateFrom(),
-		"dateTo":   reservation.GetDateTo(),
-	}}
-	result, err := reservationCollection.UpdateOne(ctx, filter, update)
-	rr.logger.Printf("Documents matched: %v\n", result.MatchedCount)
-	rr.logger.Printf("Documents updated: %v\n", result.ModifiedCount)
-
-	if err != nil {
+	query := "UPDATE reservations SET datefrom = ?, dateto = ? WHERE id = ? ALLOW FILTERING"
+	if err := rr.session.Query(query,
+		reservation.DateFrom,
+		reservation.DateTo,
+		reservation.Id,
+	).Exec(); err != nil {
 		rr.logger.Println(err)
 		return err
 	}
-	return nil
-}
 
-func (rr *ReservationRepo) getCollection() *mongo.Collection {
-	accommodationDatabase := rr.cli.Database("mongoReservation")
-	accommodationCollection := accommodationDatabase.Collection("reservations")
-	return accommodationCollection
+	return nil
 }
