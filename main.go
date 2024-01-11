@@ -32,14 +32,10 @@ func main() {
 		logger.Fatal(err)
 	}
 	defer func(reservationRepo *handlers.ReservationRepo, ctx context.Context) {
-		err := reservationRepo.Disconnect(ctx)
-		if err != nil {
+		reservationRepo.Disconnect(ctx)
 
-		}
 	}(reservationRepo, timeoutContext)
-
 	// NoSQL: Checking if the connection was established
-	reservationRepo.Ping()
 
 	//Initialize the handler and inject said logger
 	connAva, err := grpc.Dial("avaibility-service:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -54,7 +50,7 @@ func main() {
 	}(connAva)
 
 	ccava := protosava.NewAccommodationAviabilityClient(connAva)
-	service := handlers.NewServer(logger, reservationRepo,ccava)
+	service := handlers.NewServer(logger, reservationRepo, ccava)
 
 	protos.RegisterReservationServer(serverRegister, service)
 	err = serverRegister.Serve(lis)

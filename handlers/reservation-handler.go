@@ -17,8 +17,8 @@ type MyReservationServer struct {
 	cc     protosava.AccommodationAviabilityClient
 }
 
-func NewServer(l *log.Logger, r *ReservationRepo,cc protosava.AccommodationAviabilityClient) *MyReservationServer {
-	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r,cc}
+func NewServer(l *log.Logger, r *ReservationRepo, cc protosava.AccommodationAviabilityClient) *MyReservationServer {
+	return &MyReservationServer{*new(protos.UnimplementedReservationServer), l, r, cc}
 }
 
 func isValidDateFormat(dateStr string) bool {
@@ -78,7 +78,7 @@ func (s MyReservationServer) CheckActiveReservation(ctx context.Context, in *pro
 	return new(protos.Emptyaa), nil
 }
 func (s MyReservationServer) DeleteByAccomnendation(xtx context.Context, in *protos.DeleteRequestaa) (*protos.Emptyaa, error) {
-	out, err := s.repo.DeleteByAccomandation(xtx, in)
+	out, err := s.repo.DeleteByAccommodation(xtx, in)
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
@@ -153,10 +153,10 @@ func (s MyReservationServer) SetReservation(_ context.Context, in *protos.Reserv
 	_, err = s.cc.GetAccommodationCheck(context.Background(), temp)
 	if err != nil {
 		log.Printf("RPC failed: %v\n", err)
-		return nil,err
+		return nil, err
 	}
 	// Additional validation for other fields if needed
-	err = s.repo.CheckIfAvaible(trimmedReservation)
+	err = s.repo.CheckIfAvailable(trimmedReservation)
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
