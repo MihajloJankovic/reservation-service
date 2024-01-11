@@ -51,24 +51,25 @@ func New(ctx context.Context, logger *log.Logger) (*ReservationRepo, error) {
 		return nil, err
 	}
 
-	// Create 'reservations' table
-	err = session.Query(
-		`CREATE TABLE IF NOT EXISTS reservations (
-			id UUID PRIMARY KEY,
-			accid UUID,
-			email text,
-			datefrom date,
-			dateto date
-		)`).Exec()
-	if err != nil {
-		logger.Println(err)
-	}
-
 	// Return repository with logger and DB session
 	return &ReservationRepo{
 		session: session,
 		logger:  logger,
 	}, nil
+}
+
+func (rr *ReservationRepo) CreateTables(ctx context.Context) {
+	err := rr.session.Query(
+		`CREATE TABLE IF NOT EXISTS reservations (
+			id int PRIMARY KEY,
+			accid text,
+			email text,
+			datefrom text,
+			dateto text
+		)`).Exec()
+	if err != nil {
+		rr.logger.Println(err)
+	}
 }
 
 // Disconnect from database
@@ -158,7 +159,7 @@ func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, err
 }
 
 func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
-	query := "INSERT INTO reservations (id, accid, email, datefrom, dateto) VALUES (?, ?, ?, ?, ?) ALLOW FILTERING"
+	query := "INSERT INTO reservations (id, accid, email, datefrom, dateto) VALUES (?, ?, ?, ?, ?)"
 
 	err := rr.session.Query(query,
 		profile.Id,
@@ -177,13 +178,11 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 }
 
 func (rr *ReservationRepo) CheckIfAvailable(profile *protos.ReservationResponse) error {
-
-	query := "SELECT id FROM reservations WHERE accid = ? AND ((datefrom <= ? AND dateto >= ?) OR (datefrom <= ? AND dateto >= ?)) ALLOW FILTERING"
+	//ssss
+	query := "SELECT id, accid, email, datefrom, dateto FROM reservations WHERE accid = ? AND datefrom = ? AND dateto = ? ALLOW FILTERING"
 	iter := rr.session.Query(query,
 		profile.Accid,
 		profile.DateFrom,
-		profile.DateFrom,
-		profile.DateTo,
 		profile.DateTo,
 	).Iter()
 
@@ -284,7 +283,7 @@ func (rr *ReservationRepo) CheckActiveReservation(ctx context.Context, in *proto
 }
 
 func (rr *ReservationRepo) Update(reservation *protos.ReservationResponse) error {
-	query := "UPDATE reservations SET datefrom = ?, dateto = ? WHERE id = ? ALLOW FILTERING"
+	query := "UPDATE reservations SET datefrom = ?, dateto = ? WHERE id = ?"
 	if err := rr.session.Query(query,
 		reservation.DateFrom,
 		reservation.DateTo,

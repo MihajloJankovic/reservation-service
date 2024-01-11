@@ -35,7 +35,7 @@ func main() {
 		reservationRepo.Disconnect(ctx)
 
 	}(reservationRepo, timeoutContext)
-	// NoSQL: Checking if the connection was established
+	reservationRepo.CreateTables(context.Background())
 
 	//Initialize the handler and inject said logger
 	connAva, err := grpc.Dial("avaibility-service:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
