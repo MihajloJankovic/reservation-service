@@ -64,8 +64,8 @@ func (rr *ReservationRepo) CreateTables(ctx context.Context) {
 			id int PRIMARY KEY,
 			accid text,
 			email text,
-			datefrom text,
-			dateto text
+			datefrom DATE,
+			dateto DATE
 		)`).Exec()
 	if err != nil {
 		rr.logger.Println(err)
@@ -179,18 +179,28 @@ func (rr *ReservationRepo) Create(profile *protos.ReservationResponse) error {
 
 func (rr *ReservationRepo) CheckIfAvailable(profile *protos.ReservationResponse) error {
 	//ssss
-	query := "SELECT id, accid, email, datefrom, dateto FROM reservations WHERE accid = ? AND datefrom = ? AND dateto = ? ALLOW FILTERING"
+	query := "SELECT id FROM reservations WHERE accid = ? AND datefrom <= ? AND dateto >= ? ALLOW FILTERING"
 	iter := rr.session.Query(query,
 		profile.Accid,
 		profile.DateFrom,
-		profile.DateTo,
+		profile.DateFrom,
 	).Iter()
 
 	if iter.NumRows() > 0 {
 		rr.logger.Println("Reservation not available for the specified date range")
 		return errors.New("Reservation not available for the specified date range")
 	}
+	query1 := "SELECT id, accid, email, datefrom, dateto FROM reservations WHERE accid = ? AND datefrom <= ? AND dateto >= ? ALLOW FILTERING"
+	iter1 := rr.session.Query(query1,
+		profile.Accid,
+		profile.DateTo,
+		profile.DateTo,
+	).Iter()
 
+	if iter1.NumRows() > 0 {
+		rr.logger.Println("Reservation not available for the specified date range")
+		return errors.New("Reservation not available for the specified date range")
+	}
 	return nil
 }
 
