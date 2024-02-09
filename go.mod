@@ -6,7 +6,7 @@ require (
 	github.com/MihajloJankovic/Aviability-Service v0.0.0-20231214113444-2de8ef32463c
 	github.com/gocql/gocql v1.6.0
 	google.golang.org/grpc v1.59.0
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.32.0
 )
 
 require (
@@ -17,5 +17,6 @@ require (
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 )

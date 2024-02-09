@@ -53,7 +53,7 @@ func (s MyReservationServer) GetAllReservationsByEmail(ctx context.Context, in *
 	}
 	return out, nil
 }
-func (s MyReservationServer) DeleteReservationById(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
+func (s MyReservationServer) DeleteReservationById(ctx context.Context, in *protos.ReservationRequest) (*protos.Emptyaa, error) {
 	out, err := s.repo.DeleteReservationById(ctx, in)
 	if err != nil {
 		s.logger.Println(err)
