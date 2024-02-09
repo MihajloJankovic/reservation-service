@@ -32,7 +32,7 @@ type ReservationClient interface {
 	CheckActiveReservationByEmail(ctx context.Context, in *Emaill, opts ...grpc.CallOption) (*Emptyaa, error)
 	DeleteReservationByEmail(ctx context.Context, in *Emaill, opts ...grpc.CallOption) (*Emptyaa, error)
 	GetAllReservationsByEmail(ctx context.Context, in *Emaill, opts ...grpc.CallOption) (*DummyLista, error)
-	DeleteReservationById(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*Emptyaa, error)
+	DeleteReservationById(ctx context.Context, in *Emaill, opts ...grpc.CallOption) (*Emptyaa, error)
 }
 
 type reservationClient struct {
@@ -133,7 +133,7 @@ func (c *reservationClient) GetAllReservationsByEmail(ctx context.Context, in *E
 	return out, nil
 }
 
-func (c *reservationClient) DeleteReservationById(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*Emptyaa, error) {
+func (c *reservationClient) DeleteReservationById(ctx context.Context, in *Emaill, opts ...grpc.CallOption) (*Emptyaa, error) {
 	out := new(Emptyaa)
 	err := c.cc.Invoke(ctx, "/reservation/DeleteReservationById", in, out, opts...)
 	if err != nil {
@@ -156,7 +156,7 @@ type ReservationServer interface {
 	CheckActiveReservationByEmail(context.Context, *Emaill) (*Emptyaa, error)
 	DeleteReservationByEmail(context.Context, *Emaill) (*Emptyaa, error)
 	GetAllReservationsByEmail(context.Context, *Emaill) (*DummyLista, error)
-	DeleteReservationById(context.Context, *ReservationRequest) (*Emptyaa, error)
+	DeleteReservationById(context.Context, *Emaill) (*Emptyaa, error)
 	mustEmbedUnimplementedReservationServer()
 }
 
@@ -194,7 +194,7 @@ func (UnimplementedReservationServer) DeleteReservationByEmail(context.Context, 
 func (UnimplementedReservationServer) GetAllReservationsByEmail(context.Context, *Emaill) (*DummyLista, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllReservationsByEmail not implemented")
 }
-func (UnimplementedReservationServer) DeleteReservationById(context.Context, *ReservationRequest) (*Emptyaa, error) {
+func (UnimplementedReservationServer) DeleteReservationById(context.Context, *Emaill) (*Emptyaa, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteReservationById not implemented")
 }
 func (UnimplementedReservationServer) mustEmbedUnimplementedReservationServer() {}
@@ -391,7 +391,7 @@ func _Reservation_GetAllReservationsByEmail_Handler(srv interface{}, ctx context
 }
 
 func _Reservation_DeleteReservationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReservationRequest)
+	in := new(Emaill)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -403,7 +403,7 @@ func _Reservation_DeleteReservationById_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/reservation/DeleteReservationById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReservationServer).DeleteReservationById(ctx, req.(*ReservationRequest))
+		return srv.(ReservationServer).DeleteReservationById(ctx, req.(*Emaill))
 	}
 	return interceptor(ctx, in, info, handler)
 }

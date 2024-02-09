@@ -140,9 +140,9 @@ func (rr *ReservationRepo) DeleteByAccommodation(ctx context.Context, in *protos
 
 	return new(protos.Emptyaa), nil
 }
-func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos.ReservationRequest) (*protos.Emptyaa, error) {
+func (rr *ReservationRepo) DeleteReservationById(ctx context.Context, in *protos.Emaill) (*protos.Emptyaa, error) {
 
-	temp, _ := rr.GetById(in.GetId())
+	temp, _ := rr.GetByIdIntern(in.GetEmail())
 	for _, element := range temp {
 		query := "DELETE FROM reservations_by_id_and_accid WHERE id = ? AND accid = ?"
 		if err := rr.session.Query(query, element.GetId(), element.GetAccid()).Exec(); err != nil {
@@ -274,6 +274,39 @@ func (rr *ReservationRepo) GetReservationsByEmail(ctx context.Context, in *proto
 	return &lista, nil
 }
 func (rr *ReservationRepo) GetById(id int32) ([]*protos.ReservationResponse, error) {
+	query := "SELECT id, accid, email, datefrom, dateto FROM reservations_by_id_and_accid WHERE id = ?"
+	iter := rr.session.Query(query, id).Iter()
+
+	var reservationsSlice []*protos.ReservationResponse
+	var reservation protos.ReservationResponse
+	for iter.Scan(
+		&reservation.Id,
+		&reservation.Accid,
+		&reservation.Email,
+		&reservation.DateFrom,
+		&reservation.DateTo,
+	) {
+		// Create a new instance for each row
+		currentReservation := &protos.ReservationResponse{
+			Id:       reservation.Id,
+			Accid:    reservation.Accid,
+			Email:    reservation.Email,
+			DateFrom: reservation.DateFrom,
+			DateTo:   reservation.DateTo,
+		}
+
+		// Append the new instance to the slice
+		reservationsSlice = append(reservationsSlice, currentReservation)
+	}
+
+	if err := iter.Close(); err != nil {
+		rr.logger.Println(err)
+		return nil, err
+	}
+
+	return reservationsSlice, nil
+}
+func (rr *ReservationRepo) GetByIdIntern(id string) ([]*protos.ReservationResponse, error) {
 	query := "SELECT id, accid, email, datefrom, dateto FROM reservations_by_id_and_accid WHERE id = ?"
 	iter := rr.session.Query(query, id).Iter()
 

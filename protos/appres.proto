@@ -12,7 +12,7 @@ service reservation {
   rpc CheckActiveReservationByEmail(Emaill) returns (Emptyaa);
   rpc DeleteReservationByEmail(Emaill) returns (Emptyaa);
   rpc GetAllReservationsByEmail(Emaill) returns (DummyLista);
-  rpc DeleteReservationById(ReservationRequest) returns (Emptyaa);
+  rpc DeleteReservationById(Emaill) returns (Emptyaa);
 }
 
 message Emaill{
