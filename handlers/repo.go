@@ -75,7 +75,7 @@ func (rr *ReservationRepo) CreateTables(ctx context.Context) {
 			accid text,
 			email text,
 			datefrom DATE,
-			dateto DATE , PRIMARY KEY(email,id))`, "reservations_by_id_and_email")).Exec()
+			dateto DATE , PRIMARY KEY(id,email))`, "reservations_by_id_and_email")).Exec()
 	if err != nil {
 		rr.logger.Println(err)
 	}
